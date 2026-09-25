@@ -1,0 +1,59 @@
+{
+  "network": "hardhat",
+  "chainId": 4663,
+  "roles": {
+    "admin": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "guardian": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+    "keeper": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+    "treasury": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+  },
+  "wells": {
+    "TSLA": {
+      "well": "0x31b1939e53385631B0B27cDA97840995319ABf20",
+      "position": "0x019D0605376d6DD681A9E7eba9f293A19ba5c333",
+      "equityToken": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "name": "Tesla"
+    },
+    "NVDA": {
+      "well": "0x0e9E606349443b533347D443bA3E00FDa4D93690",
+      "position": "0x71C63d11BcfADf8D53d13aA9d4A63619ad872E5B",
+      "equityToken": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "name": "NVIDIA"
+    },
+    "AAPL": {
+      "well": "0xa54C848fF17DE43816e63cE639540E4a0cb244ba",
+      "position": "0x9a9edEA6C804F40d81B1Dc4ae551AFfbad2ec5Bb",
+      "equityToken": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "name": "Apple"
+    },
+    "PLTR": {
+      "well": "0xbAD6a56C82776364AA4Db83B3d2d2FC3693eba7A",
+      "position": "0x984E915350aDA8b4558bef8a517b8FDcaec556c7",
+      "equityToken": "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A",
+      "name": "Palantir"
+    },
+    "META": {
+      "well": "0x74E7CF978C61685dB8527086CD66316Ce7aF295c",
+      "position": "0x1D006bf51E1C032F4f754EE38786450ba0f78e29",
+      "equityToken": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
+      "name": "Meta"
+    }
+  },
+  "creditLines": {
+    "META": "0xb81bbe40Fc1e66CA48fAcD84809CF8F7A1f78f43"
+  },
+  "timelock": "0x98FAc3Bf0191c166FfA56375af9927b7C4b5a75c",
+  "usdg": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+  "wellToken": "0x6664cF0845028F5e24675ef913d3d0404846E14a",
+  "oracle": "0xAbdE60f875bc1e3619dB381ac142f8C5F5f5f386",
+  "swapAdapter": "0xf3d36A00741950A1D53299D70A53b5402662C21E",
+  "drawdownRetire": "0xC39261096656F5BFe40D142F86e7b608f3996966",
+  "feeRouter": "0x60D27E7F5c7c1E161F5DE52A7A5a76CbC287AA2E",
+  "registry": "0x9210c28Ac5B87946c64b5f23D41aDE5913eF79E1",
+  "basketProgram": "0x8c996D1362420c45513F22a3E28dc784beb0bE3f",
+  "pendingTimelockAcceptances": [
+    "0xAbdE60f875bc1e3619dB381ac142f8C5F5f5f386",
+    "0x9210c28Ac5B87946c64b5f23D41aDE5913eF79E1",
+    "0xf3d36A00741950A1D53299D70A53b5402662C21E"
+  ]
+}

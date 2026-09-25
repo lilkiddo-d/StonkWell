@@ -1,0 +1,218 @@
+{
+  "AAPL": {
+    "oracleUsd": 336.30526799,
+    "updatedAt": "2026-09-24T19:55:25.000Z",
+    "pool": {
+      "fee": 3000,
+      "tickSpacing": 60,
+      "poolId": "0xc748f4671a867db48b552f6b7650bf3255e05f80f00e3f7aad1b17ccb7898fdb",
+      "spotUsdg": 336.4977,
+      "offBps": 6,
+      "liquidity": "621145818957060926"
+    }
+  },
+  "AMD": {
+    "oracleUsd": 629.89,
+    "updatedAt": "2026-09-24T19:55:38.000Z",
+    "pool": {
+      "fee": 10000,
+      "tickSpacing": 200,
+      "poolId": "0xde9f85fdd9e05a943a52f2c69ffafe3064a3287df03d02c9b431bc92d4781274",
+      "spotUsdg": 624.3874,
+      "offBps": -87,
+      "liquidity": "147726232117282730"
+    }
+  },
+  "AMZN": {
+    "oracleUsd": 248.78265,
+    "updatedAt": "2026-09-24T20:11:45.000Z",
+    "pool": {
+      "fee": 3000,
+      "tickSpacing": 60,
+      "poolId": "0xd32646872e6712af8cf778e34b6bbef1d2ae0bddd83764e1b07333518ad59333",
+      "spotUsdg": 249.3252,
+      "offBps": 22,
+      "liquidity": "4956821630817166"
+    }
+  },
+  "CRCL": {
+    "oracleUsd": 92.67216156,
+    "updatedAt": "2026-09-24T20:00:57.000Z",
+    "pool": {
+      "fee": 3000,
+      "tickSpacing": 60,
+      "poolId": "0x60a78f9462af550fbf603774b1eeb4a6b880cd2a475862a07b22d035f22310b7",
+      "spotUsdg": 0,
+      "offBps": -10000,
+      "liquidity": "0"
+    }
+  },
+  "GME": {
+    "oracleUsd": 24.83945,
+    "updatedAt": "2026-09-24T21:00:20.000Z",
+    "pool": {
+      "fee": 10000,
+      "tickSpacing": 200,
+      "poolId": "0x3d436b4fdc532c61a0bf15d6cae80a66eb8f28ee9daec34dbec4b5bc9964063b",
+      "spotUsdg": 25.1219,
+      "offBps": 114,
+      "liquidity": "2439930943857519"
+    }
+  },
+  "GOOGL": {
+    "oracleUsd": 341.9180434,
+    "updatedAt": "2026-09-24T16:17:49.000Z",
+    "pool": {
+      "fee": 3000,
+      "tickSpacing": 60,
+      "poolId": "0xd4ecb79fdc521d7725d22b33ed43cb4e47aa96bfad76aa29577e3151f723ac5e",
+      "spotUsdg": 342.0848,
+      "offBps": 5,
+      "liquidity": "553944668310765286"
+    }
+  },
+  "INTC": {
+    "oracleUsd": 127.72555,
+    "updatedAt": "2026-09-24T21:46:49.000Z",
+    "pool": {
+      "fee": 10000,
+      "tickSpacing": 200,
+      "poolId": "0xf2e329e631d0fb315a5c563ee3a9120f24822b5ef6c502a91cb56b174d5d8c22",
+      "spotUsdg": 126.2561,
+      "offBps": -115,
+      "liquidity": "238304941932903906"
+    }
+  },
+  "META": {
+    "oracleUsd": 778.24616103,
+    "updatedAt": "2026-09-24T18:56:40.000Z",
+    "pool": {
+      "fee": 3000,
+      "tickSpacing": 60,
+      "poolId": "0x5875d407a42965b0e768c8925cea290e06fa50603ef34fc99eb92a1050e6ae36",
+      "spotUsdg": 776.1318,
+      "offBps": -27,
+      "liquidity": "4528906084311534305"
+    }
+  },
+  "MSFT": {
+    "oracleUsd": 497.99156201,
+    "updatedAt": "2026-09-24T19:22:00.000Z",
+    "pool": {
+      "fee": 3000,
+      "tickSpacing": 60,
+      "poolId": "0x9194a557b6a6bb2236b49ea7e2bbccec5d3eeb705aef00903be4b3de1d949579",
+      "spotUsdg": 497.5235,
+      "offBps": -9,
+      "liquidity": "285782975241895978"
+    }
+  },
+  "MSTR": {
+    "oracleUsd": 161.3299,
+    "updatedAt": "2026-09-24T21:53:41.000Z",
+    "pool": {
+      "fee": 10000,
+      "tickSpacing": 200,
+      "poolId": "0x72f7109f6d7e54e984f99c9f8d76f6b35617fc4f977ff311c9eaa5a2a524030f",
+      "spotUsdg": 3.402567865403252e+50,
+      "offBps": 2.1090745518364864e+52,
+      "liquidity": "0"
+    }
+  },
+  "MU": {
+    "oracleUsd": 1079.60577353,
+    "updatedAt": "2026-09-24T19:55:34.000Z",
+    "pool": {
+      "fee": 10000,
+      "tickSpacing": 200,
+      "poolId": "0x6fa3ee0048e78bf0a513eb0ab56f482944a767c21db990fcf555605e69f05659",
+      "spotUsdg": 1072.5136,
+      "offBps": -66,
+      "liquidity": "71364721538100125"
+    }
+  },
+  "NVDA": {
+    "oracleUsd": 224.40881781,
+    "updatedAt": "2026-09-24T16:41:56.000Z",
+    "pool": {
+      "fee": 3000,
+      "tickSpacing": 60,
+      "poolId": "0x3bb34a44f1b2b5f32c034c38a53065a521a47b199700fa9bd19d60985ff24bf1",
+      "spotUsdg": 223.8676,
+      "offBps": -24,
+      "liquidity": "511853561139356585"
+    }
+  },
+  "PLTR": {
+    "oracleUsd": 191.5269,
+    "updatedAt": "2026-09-24T20:24:20.000Z",
+    "pool": {
+      "fee": 10000,
+      "tickSpacing": 200,
+      "poolId": "0xee430ee1003e1985e1828a01b9a20dad67ad4302994fe2abb4a173de4ac54623",
+      "spotUsdg": 192.1457,
+      "offBps": 32,
+      "liquidity": "706191008797216946"
+    }
+  },
+  "QQQ": {
+    "oracleUsd": 741.78447201,
+    "updatedAt": "2026-09-24T16:41:06.000Z",
+    "pool": {
+      "fee": 3000,
+      "tickSpacing": 60,
+      "poolId": "0xf9568ec0cba6e9ba30d9daabbf3e807813b8852e5737b7d83ea06529c73c9758",
+      "spotUsdg": 739.7076,
+      "offBps": -28,
+      "liquidity": "365295266107527"
+    }
+  },
+  "SNDK": {
+    "oracleUsd": 1758.9362,
+    "updatedAt": "2026-09-24T21:42:43.000Z",
+    "pool": {
+      "fee": 10000,
+      "tickSpacing": 200,
+      "poolId": "0x2707cb88a6a40fa0f948f58958051ba097d6f6a3cf7f87929bd68ccc5becea24",
+      "spotUsdg": 1745.938,
+      "offBps": -74,
+      "liquidity": "33823305288966269"
+    }
+  },
+  "SPCX": {
+    "oracleUsd": 147.885075,
+    "updatedAt": "2026-09-24T19:55:19.000Z",
+    "pool": {
+      "fee": 10000,
+      "tickSpacing": 200,
+      "poolId": "0xcb6ffbcc84359535c2cc0a5688c0a76520ea6e0a4820fddd3ac8d7880e576370",
+      "spotUsdg": 147.6018,
+      "offBps": -19,
+      "liquidity": "762287629941988019"
+    }
+  },
+  "SPY": {
+    "oracleUsd": 766.69992468,
+    "updatedAt": "2026-09-24T04:04:06.000Z",
+    "pool": {
+      "fee": 3000,
+      "tickSpacing": 60,
+      "poolId": "0xfe2a80bb5618fd14984b92ca6d45bf5ba67443ddb1435e28b2e48df2fc1526cd",
+      "spotUsdg": 767.1882,
+      "offBps": 6,
+      "liquidity": "6176249582801496857"
+    }
+  },
+  "TSLA": {
+    "oracleUsd": 378.34,
+    "updatedAt": "2026-09-24T19:13:11.000Z",
+    "pool": {
+      "fee": 3000,
+      "tickSpacing": 60,
+      "poolId": "0x8517f8071ae5b831b738052f12125e8e3d6c158b78728aa44ce3b25e5104d32e",
+      "spotUsdg": 376.8498,
+      "offBps": -39,
+      "liquidity": "520346066471316665"
+    }
+  }
+}

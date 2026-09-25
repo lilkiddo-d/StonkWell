@@ -1,0 +1,114 @@
+﻿{
+    "AAPL":  {
+                 "token":  "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+                 "name":  "Apple •",
+                 "symbol":  "AAPL",
+                 "decimals":  18,
+                 "holders":  80270
+             },
+    "AMD":  {
+                "token":  "0x86923f96303D656E4aa86D9d42D1e57ad2023fdC",
+                "name":  "AMD •",
+                "symbol":  "AMD",
+                "decimals":  18,
+                "holders":  40849
+            },
+    "AMZN":  {
+                 "token":  "0x12f190a9F9d7D37a250758b26824B97CE941bF54",
+                 "name":  "Amazon •",
+                 "symbol":  "AMZN",
+                 "decimals":  18,
+                 "holders":  52947
+             },
+    "CRCL":  {
+                 "token":  "0xdF0992E440dD0be65BD8439b609d6D4366bf1CB5",
+                 "name":  "Circle Internet Group •",
+                 "symbol":  "CRCL",
+                 "decimals":  18,
+                 "holders":  11572
+             },
+    "GME":  {
+                "token":  "0x1b0E319c6A659F002271B69dB8A7df2F911c153E",
+                "name":  "GameStop •",
+                "symbol":  "GME",
+                "decimals":  18,
+                "holders":  56991
+            },
+    "GOOGL":  {
+                  "token":  "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+                  "name":  "Alphabet Class A •",
+                  "symbol":  "GOOGL",
+                  "decimals":  18,
+                  "holders":  67845
+              },
+    "INTC":  {
+                 "token":  "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681",
+                 "name":  "Intel •",
+                 "symbol":  "INTC",
+                 "decimals":  18,
+                 "holders":  29126
+             },
+    "META":  {
+                 "token":  "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
+                 "name":  "Meta Platforms •",
+                 "symbol":  "META",
+                 "decimals":  18,
+                 "holders":  49384
+             },
+    "MSFT":  {
+                 "token":  "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
+                 "name":  "Microsoft •",
+                 "symbol":  "MSFT",
+                 "decimals":  18,
+                 "holders":  59822
+             },
+    "MSTR":  {
+                 "token":  "0xec262a75e413fAfD0dF80480274532C79D42da09",
+                 "name":  "Strategy Inc. •",
+                 "symbol":  "MSTR",
+                 "decimals":  18,
+                 "holders":  16578
+             },
+    "NVDA":  {
+                 "token":  "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+                 "name":  "NVIDIA •",
+                 "symbol":  "NVDA",
+                 "decimals":  18,
+                 "holders":  178307
+             },
+    "PLTR":  {
+                 "token":  "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A",
+                 "name":  "Palantir Technologies •",
+                 "symbol":  "PLTR",
+                 "decimals":  18,
+                 "holders":  38522
+             },
+    "QQQ":  {
+                "token":  "0xD5f3879160bc7c32ebb4dC785F8a4F505888de68",
+                "name":  "Invesco QQQ •",
+                "symbol":  "QQQ",
+                "decimals":  18,
+                "holders":  27105
+            },
+    "SPCX":  {
+                 "token":  "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+                 "name":  "Space Exploration Technologies Corp •",
+                 "symbol":  "SPCX",
+                 "decimals":  18,
+                 "holders":  109159
+             },
+    "SPY":  {
+                "token":  "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+                "name":  "SPDR S\u0026P 500 ETF Trust •",
+                "symbol":  "SPY",
+                "decimals":  18,
+                "holders":  70182
+            },
+    "TSLA":  {
+                 "token":  "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+                 "name":  "Tesla •",
+                 "symbol":  "TSLA",
+                 "decimals":  18,
+                 "holders":  68100
+             }
+}
