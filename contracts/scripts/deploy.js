@@ -42,7 +42,9 @@ async function main() {
   const env = LIVE ? liveEnv() : await localEnv(deployer);
   out.usdg = env.usdg;
 
-  const wellToken = await deploy("WellToken", [roles.treasury, wad(config.launch.wellTokenSupply)]);
+  const wellToken = process.env.WELL_TOKEN_ADDRESS
+    ? await existingWellToken(process.env.WELL_TOKEN_ADDRESS)
+    : await deploy("WellToken", [roles.treasury, wad(config.launch.wellTokenSupply)]);
   out.wellToken = await wellToken.getAddress();
 
   const oracle = await deploy("WellOracle", [
@@ -173,6 +175,22 @@ async function main() {
   fs.writeFileSync(file, JSON.stringify(out, null, 2));
   console.log(`\nWrote ${path.relative(process.cwd(), file)}`);
   console.log("Next: schedule acceptOwnership() through the timelock for:", out.pendingTimelockAcceptances.join(", "));
+}
+
+// DrawdownRetire stores the token immutably and calls burn(uint256) on it, so reject anything that can't burn.
+async function existingWellToken(address) {
+  if (!ethers.isAddress(address)) throw new Error("WELL_TOKEN_ADDRESS is not a valid address");
+  if ((await ethers.provider.getCode(address)) === "0x") throw new Error(`No contract at WELL_TOKEN_ADDRESS ${address}`);
+  const token = await ethers.getContractAt("WellToken", address);
+  const [symbol, decimals, supply] = await Promise.all([token.symbol(), token.decimals(), token.totalSupply()]);
+  if (decimals !== 18n) throw new Error(`$WELL must have 18 decimals, got ${decimals}`);
+  try {
+    await token.burn.staticCall(0);
+  } catch {
+    throw new Error(`Token at ${address} does not support burn(uint256), which DrawdownRetire requires`);
+  }
+  console.log(`  ${"WellToken".padEnd(18)} ${address} (existing ${symbol}, supply ${ethers.formatEther(supply)})`);
+  return token;
 }
 
 function required(name) {

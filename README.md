@@ -57,6 +57,7 @@ ADMIN_MULTISIG=0x...      # proposer/executor of the 48h timelock
 GUARDIAN_MULTISIG=0x...   # must differ from admin
 KEEPER_ADDRESS=0x...
 TREASURY_MULTISIG=0x...   # receives the fixed $WELL supply
+WELL_TOKEN_ADDRESS=0x...  # optional: use an already-deployed $WELL (18 decimals, must support burn(uint256))
 npm run deploy:robinhood
 npm run export-abis
 ```
