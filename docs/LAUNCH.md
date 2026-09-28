@@ -67,5 +67,5 @@ wallet's key with hidden input. Its first live cycle places each Well's price ra
 
 ## Known limits at launch
 
-- **Buy-and-burn of $WELL can't run yet.** $WELL's Pons pool is paired with ETH and uses the Pons hook, which the swap adapter doesn't support. Protocol fees collect safely in the DrawdownRetire contract (which has no withdrawal path) until the adapter supports that pool. See `docs/AUDIT.md` §3.
+- **Buy-and-burn of $WELL starts once $WELL graduates on Pons.** Its trading pool only exists after graduation. Until then, protocol fees collect safely in the DrawdownRetire contract (which has no withdrawal path). When it graduates, run `node contracts\scripts\register-well-pool.js`: it checks the pool is live and prints the one transaction that registers it (from the deployer wallet before the 48h handoff, from the admin Safe after). The keeper then starts buying and burning on its next cycle.
 - **No external audit yet.** Caps start small: $25,000 per Well, and the META Credit Line takes $10,000 in supply and $5,000 in borrows.

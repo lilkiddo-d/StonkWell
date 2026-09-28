@@ -44,4 +44,4 @@ Stonkwell provides the same product as TickerSpring: managed Equity Token / USDG
 ## Deployment status
 - **Mainnet fork:** all contracts are verified by the unit suite (33 tests) and by a Robinhood Chain mainnet-fork suite on the live Uniswap v4 META/USDG pool (5 tests).
 - **Deploy script:** `scripts/deploy.js` has been dry-run against the fork.
-- **Mainnet:** not yet deployed. It needs the multisigs, an independent audit, and a $WELL/USDG pool registered on the swap adapter before drawdowns can run.
+- **Mainnet:** not yet deployed. It needs the multisigs, an independent audit, and, once $WELL graduates on Pons, its $WELL/ETH pool registered on the swap adapter (`scripts/register-well-pool.js`) before drawdowns can run.

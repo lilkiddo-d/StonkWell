@@ -17,6 +17,9 @@ import {ISwapAdapter} from "../interfaces/ISwapAdapter.sol";
 /// @title V4SwapAdapter
 /// @notice Exact-input swaps through owner-registered Uniswap v4 pools, directly on the PoolManager.
 ///         Routes default to the direct pool, or two hops through the hub token (USDG).
+/// @dev Pools with hooks are rejected unless the owner has allowlisted that exact hook (the launchpad hook of
+///      the $WELL pool). Revoking a hook blocks every route through its pools. Native ETH (address(0)) may be
+///      an intermediate hop but never the input or output: its deltas net to zero inside the unlock.
 contract V4SwapAdapter is ISwapAdapter, IUnlockCallback, Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using BalanceDeltaLibrary for BalanceDelta;
@@ -27,8 +30,10 @@ contract V4SwapAdapter is ISwapAdapter, IUnlockCallback, Ownable2Step, Reentranc
     address public immutable hub;
 
     mapping(bytes32 pair => PoolKey) private _pools;
+    mapping(address hook => bool) public hookAllowed;
 
     event PoolSet(address indexed token0, address indexed token1, uint24 fee, int24 tickSpacing);
+    event HookAllowed(address indexed hook, bool allowed);
 
     error InvalidPool();
     error InvalidRoute();
@@ -41,10 +46,16 @@ contract V4SwapAdapter is ISwapAdapter, IUnlockCallback, Ownable2Step, Reentranc
         hub = hub_;
     }
 
+    function setHookAllowed(address hook, bool allowed) external onlyOwner {
+        if (hook == address(0)) revert InvalidPool();
+        hookAllowed[hook] = allowed;
+        emit HookAllowed(hook, allowed);
+    }
+
     function setPool(PoolKey calldata key) external onlyOwner {
         address c0 = Currency.unwrap(key.currency0);
         address c1 = Currency.unwrap(key.currency1);
-        if (c0 == address(0) || c0 >= c1 || address(key.hooks) != address(0)) revert InvalidPool();
+        if (c0 >= c1 || !_hookOk(address(key.hooks))) revert InvalidPool();
         _pools[_pairId(c0, c1)] = key;
         emit PoolSet(c0, c1, key.fee, key.tickSpacing);
     }
@@ -65,7 +76,8 @@ contract V4SwapAdapter is ISwapAdapter, IUnlockCallback, Ownable2Step, Reentranc
         address[] memory path = route.length == 0 ? _defaultPath(tokenIn, tokenOut) : abi.decode(route, (address[]));
         if (
             path.length < 2 || path.length > MAX_HOPS + 1 || path[0] != tokenIn
-                || path[path.length - 1] != tokenOut || amountIn == 0 || amountIn > uint256(type(int256).max)
+                || path[path.length - 1] != tokenOut || tokenIn == address(0) || tokenOut == address(0)
+                || amountIn == 0 || amountIn > uint256(type(int256).max)
         ) revert InvalidRoute();
 
         IERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
@@ -81,7 +93,7 @@ contract V4SwapAdapter is ISwapAdapter, IUnlockCallback, Ownable2Step, Reentranc
         uint256 amount = amountIn;
         for (uint256 i; i + 1 < path.length; ++i) {
             (PoolKey memory key, bool exists) = poolFor(path[i], path[i + 1]);
-            if (!exists) revert InvalidRoute();
+            if (!exists || !_hookOk(address(key.hooks))) revert InvalidRoute();
             bool zeroForOne = path[i] == Currency.unwrap(key.currency0);
             BalanceDelta delta = poolManager.swap(
                 key,
@@ -118,6 +130,10 @@ contract V4SwapAdapter is ISwapAdapter, IUnlockCallback, Ownable2Step, Reentranc
             path[1] = hub;
             path[2] = tokenOut;
         }
+    }
+
+    function _hookOk(address hook) private view returns (bool) {
+        return hook == address(0) || hookAllowed[hook];
     }
 
     function _pairId(address a, address b) private pure returns (bytes32) {
