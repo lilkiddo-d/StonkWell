@@ -5,7 +5,6 @@ Managed, oracle-guarded liquidity for Equity Tokens on Robinhood Chain. You sink
 - [`docs/OVERVIEW.md`](docs/OVERVIEW.md): full project write-up (what it is, how it works, economics, safety, status, roadmap)
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): one-page, contract-by-contract mapping from TickerSpring to Stonkwell
 - [`docs/RISK_REVIEW.md`](docs/RISK_REVIEW.md): oracle staleness, guardian permissions, collateral valuation, and other findings
-- [`docs/DISCLAIMER.md`](docs/DISCLAIMER.md): user-facing disclaimer (draft for legal review)
 
 ## Layout
 

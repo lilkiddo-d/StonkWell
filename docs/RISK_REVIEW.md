@@ -65,4 +65,4 @@ This is an internal pre-audit note. It covers the three areas in the brief (orac
 3. Seed each Well; launch with a $25k Held Value cap per Well.
 4. Create and register a $WELL/USDG pool and set drawdown input limits.
 5. Set the sequencer-uptime feed once Chainlink publishes one.
-6. Complete a legal review of `DISCLAIMER.md` and add geofencing to the hosted interface.
+6. Complete a legal review before opening to the public.

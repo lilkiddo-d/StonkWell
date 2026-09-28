@@ -8,7 +8,6 @@ const TOC = [
   ["oracle", "Prices and market hours"],
   ["governance", "Governance and safety"],
   ["glossary", "Glossary"],
-  ["disclaimer", "Disclaimer"],
 ] as const;
 
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
@@ -111,16 +110,6 @@ export default function DocsPage() {
             <dt>Drawdown and retire</dt><dd>Spending the protocol fee share on $WELL and burning it.</dd>
             <dt>$WELL</dt><dd>Stonkwell&apos;s fixed-supply token.</dd>
           </dl>
-        </Section>
-
-        <Section id="disclaimer" title="Disclaimer">
-          <p><strong>Equity Tokens are not shares.</strong> Equity Tokens are tokenized debt securities issued by Robinhood Assets (Jersey) Limited that track the price of a stock or ETF. Holding one, directly or through a Well, is not ownership of the company. It gives no voting rights and no claim on the company&apos;s assets. You also carry the issuer&apos;s credit and operational risk.</p>
-          <p><strong>Well shares are not principal-protected.</strong> They are not a stablecoin, deposit or savings product, and they are not insured or guaranteed by anyone. Their value can fall, including through impermanent loss, swap costs and smart-contract failure.</p>
-          <p><strong>Yield Rate is not a forecast.</strong> It is trailing fee income, annualized. It ignores Equity Token price moves and can drop to zero.</p>
-          <p><strong>Credit Lines can be liquidated.</strong> Prices pause outside market hours and can gap at the open, past your liquidation threshold.</p>
-          <p><strong>$WELL</strong> gives no claim on profits or fees. Drawdown and retire reduces supply and does not support any price.</p>
-          <p><strong>Restricted persons.</strong> Stonkwell is not offered to US persons, or to anyone in a sanctioned or otherwise restricted jurisdiction.</p>
-          <p><strong>Not advice; not affiliated.</strong> Nothing here is investment, legal or tax advice. Stonkwell is independent software and is not affiliated with Robinhood, the Equity Token issuer, Paxos, Uniswap Labs, Chainlink Labs or any company whose stock an Equity Token tracks. You use it at your own risk.</p>
         </Section>
       </article>
     </div>

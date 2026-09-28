@@ -19,7 +19,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <main>{children}</main>
           <footer className="footer">
             <span>Stonkwell. Independent software, not affiliated with Robinhood, Uniswap or any issuer.</span>
-            <span>Not investment advice. Not available to US persons or in restricted jurisdictions.</span>
           </footer>
         </Providers>
       </body>
