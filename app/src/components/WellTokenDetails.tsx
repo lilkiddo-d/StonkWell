@@ -12,12 +12,12 @@ import { Pill, Stat } from "./ui";
 const TRADE_URL = process.env.NEXT_PUBLIC_WELL_TRADE_URL || "https://www.ponsfamily.com/launchpad";
 
 export function WellTokenDetails() {
-  const { deployment } = useDeployment();
+  const { deployment, chainId } = useDeployment();
   const { isConnected } = useAccount();
   const { watchAsset, isPending } = useWatchAsset();
   const [copied, setCopied] = useState(false);
-  const t = { address: deployment?.wellToken, abi: wellTokenAbi } as const;
-  const { data } = useReadContracts({
+  const t = { address: deployment?.wellToken, abi: wellTokenAbi, chainId } as const;
+  const { data, isError } = useReadContracts({
     allowFailure: true,
     query: { enabled: Boolean(deployment) },
     contracts: [
@@ -25,9 +25,10 @@ export function WellTokenDetails() {
       { ...t, functionName: "symbol" },
       { ...t, functionName: "decimals" },
       { ...t, functionName: "totalSupply" },
-      { address: deployment?.drawdownRetire, abi: drawdownRetireAbi, functionName: "totalRetired" },
+      { address: deployment?.drawdownRetire, abi: drawdownRetireAbi, chainId, functionName: "totalRetired" },
     ],
   });
+  const unreachable = isError || (data !== undefined && data.every((x) => x.status !== "success"));
   const r = <T,>(i: number) => (data?.[i]?.status === "success" ? (data[i].result as T) : undefined);
   const name = r<string>(0);
   const symbol = r<string>(1);
@@ -59,6 +60,7 @@ export function WellTokenDetails() {
       </div>
       {deployment && (
         <>
+          {unreachable && <p className="tx-status error">Couldn&apos;t read the token from the network.</p>}
           <div className="stats-grid">
             <Stat label="Name" value={name ?? "…"} hint={symbol ? `Symbol ${symbol}` : undefined} />
             <Stat label="Total supply" value={fmtAmount(supply, d, 0)} />

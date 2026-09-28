@@ -8,8 +8,8 @@ import { fmtBps, fmtUsdg } from "@/lib/format";
 import { Pill, Stat } from "./ui";
 
 export function BasketStatus() {
-  const { deployment } = useDeployment();
-  const b = { address: deployment?.basketProgram, abi: basketProgramAbi } as const;
+  const { deployment, chainId } = useDeployment();
+  const b = { address: deployment?.basketProgram, abi: basketProgramAbi, chainId } as const;
   const { data } = useReadContracts({
     allowFailure: true,
     query: { enabled: Boolean(deployment) },

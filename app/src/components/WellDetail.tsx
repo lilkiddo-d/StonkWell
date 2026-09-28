@@ -67,6 +67,7 @@ function SinkPanel({ well, usdg, ticker, stats }: { well: Address; usdg: Address
   const [amount, setAmount] = useState("");
   const acct = useWellAccount(well, usdg);
   const tx = useTx();
+  const { chainId } = useDeployment();
 
   const isShares = tab === "Redeem in kind";
   const parsed = safeParse(amount, isShares ? WELL_SHARE_DECIMALS : USDG_DECIMALS);
@@ -79,21 +80,21 @@ function SinkPanel({ well, usdg, ticker, stats }: { well: Address; usdg: Address
     if (tab === "Sink") {
       await tx.run("Sinking", async ({ ensureAllowance }) => {
         await ensureAllowance(usdg, well, parsed);
-        return tx.writeContractAsync({ address: well, abi: wellAbi, functionName: "deposit", args: [parsed, me] });
+        return tx.writeContractAsync({ address: well, abi: wellAbi, chainId, functionName: "deposit", args: [parsed, me] });
       });
     } else if (tab === "Withdraw") {
       const all = acct.maxWithdraw !== undefined && parsed === acct.maxWithdraw && acct.shares !== undefined;
       await tx.run("Withdrawing", async () =>
         all
-          ? tx.writeContractAsync({ address: well, abi: wellAbi, functionName: "redeem", args: [acct.shares!, me, me] })
-          : tx.writeContractAsync({ address: well, abi: wellAbi, functionName: "withdraw", args: [parsed, me, me] })
+          ? tx.writeContractAsync({ address: well, abi: wellAbi, chainId, functionName: "redeem", args: [acct.shares!, me, me] })
+          : tx.writeContractAsync({ address: well, abi: wellAbi, chainId, functionName: "withdraw", args: [parsed, me, me] })
       );
     } else {
       const supply = stats.totalSupply ?? 0n;
       const minEquity = supply && stats.equityHeld ? (stats.equityHeld * parsed * 98n) / (supply * 100n) : 0n;
       const minUsdg = supply && stats.usdgHeld ? (stats.usdgHeld * parsed * 98n) / (supply * 100n) : 0n;
       await tx.run("Redeeming in kind", async () =>
-        tx.writeContractAsync({ address: well, abi: wellAbi, functionName: "redeemInKind", args: [parsed, me, me, minEquity, minUsdg] })
+        tx.writeContractAsync({ address: well, abi: wellAbi, chainId, functionName: "redeemInKind", args: [parsed, me, me, minEquity, minUsdg] })
       );
     }
     setAmount("");

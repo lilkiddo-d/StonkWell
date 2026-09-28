@@ -5,6 +5,7 @@ import { erc20Abi, formatUnits, maxUint256, type Address } from "viem";
 import { useAccount, useReadContracts } from "wagmi";
 import { borrowDeskAbi, wellAbi } from "@/generated/abis";
 import { explorerAddress } from "@/lib/chains";
+import { useDeployment } from "@/lib/deployment";
 import { fmtAmount, fmtBps, fmtHealth, fmtUsdg, fmtWadPct, safeParse, USDG_DECIMALS, WELL_SHARE_DECIMALS } from "@/lib/format";
 import { TxStatus, useTx } from "./Tx";
 import { AmountInput, Pill, Stat, Tabs } from "./ui";
@@ -14,7 +15,8 @@ type Tab = (typeof TABS)[number];
 
 export function CreditLine({ ticker, desk, well, usdg }: { ticker: string; desk: Address; well: Address; usdg: Address }) {
   const { address } = useAccount();
-  const d = { address: desk, abi: borrowDeskAbi } as const;
+  const { chainId } = useDeployment();
+  const d = { address: desk, abi: borrowDeskAbi, chainId } as const;
   const { data } = useReadContracts({
     allowFailure: true,
     contracts: [
@@ -29,7 +31,7 @@ export function CreditLine({ ticker, desk, well, usdg }: { ticker: string; desk:
       { ...d, functionName: "borrowCap" },
       { ...d, functionName: "paused" },
       { ...d, functionName: "totalCollateralShares" },
-      { address: well, abi: wellAbi, functionName: "totalSupply" },
+      { address: well, abi: wellAbi, chainId, functionName: "totalSupply" },
     ],
   });
   const acctQ = useReadContracts({
@@ -42,8 +44,8 @@ export function CreditLine({ ticker, desk, well, usdg }: { ticker: string; desk:
       { ...d, functionName: "collateralValue", args: [address!] },
       { ...d, functionName: "borrowable", args: [address!] },
       { ...d, functionName: "healthFactor", args: [address!] },
-      { address: well, abi: wellAbi, functionName: "balanceOf", args: [address!] },
-      { address: usdg, abi: erc20Abi, functionName: "balanceOf", args: [address!] },
+      { address: well, abi: wellAbi, chainId, functionName: "balanceOf", args: [address!] },
+      { address: usdg, abi: erc20Abi, chainId, functionName: "balanceOf", args: [address!] },
       { ...d, functionName: "maxDeposit", args: [address!] },
     ],
   });

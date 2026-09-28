@@ -8,20 +8,20 @@ import { fmtUsdg } from "@/lib/format";
 import { Stat } from "./ui";
 
 export function HomeStats() {
-  const { deployment } = useDeployment();
+  const { deployment, chainId } = useDeployment();
   const wells = deployment ? Object.values(deployment.wells) : [];
   const token = useReadContracts({
     allowFailure: true,
     query: { enabled: Boolean(deployment) },
     contracts: [
-      { address: deployment?.drawdownRetire, abi: drawdownRetireAbi, functionName: "totalRetired" },
-      { address: deployment?.wellToken, abi: wellTokenAbi, functionName: "totalSupply" },
+      { address: deployment?.drawdownRetire, abi: drawdownRetireAbi, chainId, functionName: "totalRetired" },
+      { address: deployment?.wellToken, abi: wellTokenAbi, chainId, functionName: "totalSupply" },
     ],
   });
   const held = useReadContracts({
     allowFailure: true,
     query: { enabled: wells.length > 0 },
-    contracts: wells.map((w) => ({ address: w.well, abi: wellAbi, functionName: "totalAssets" }) as const),
+    contracts: wells.map((w) => ({ address: w.well, abi: wellAbi, chainId, functionName: "totalAssets" }) as const),
   });
   const totalHeld = held.data ? held.data.reduce((sum, r) => sum + (r.status === "success" ? r.result : 0n), 0n) : undefined;
   const retired = token.data?.[0]?.result;

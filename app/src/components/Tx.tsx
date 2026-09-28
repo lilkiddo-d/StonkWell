@@ -3,14 +3,17 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { erc20Abi, type Address, type Hash } from "viem";
-import { useAccount, usePublicClient, useWriteContract } from "wagmi";
+import { useAccount, usePublicClient, useSwitchChain, useWriteContract } from "wagmi";
+import { useDeployment } from "@/lib/deployment";
 
 type TxState = { busy: boolean; message?: string; error?: string };
 
 export function useTx() {
-  const client = usePublicClient();
+  const { chainId } = useDeployment();
+  const client = usePublicClient({ chainId });
   const queryClient = useQueryClient();
-  const { address } = useAccount();
+  const { address, chainId: walletChain } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
   const { writeContractAsync } = useWriteContract();
   const [state, setState] = useState<TxState>({ busy: false });
 
@@ -30,12 +33,16 @@ export function useTx() {
     });
     if (current >= amount) return;
     setState({ busy: true, message: "Approving…" });
-    await wait(await writeContractAsync({ address: token, abi: erc20Abi, functionName: "approve", args: [spender, amount] }));
+    await wait(await writeContractAsync({ address: token, abi: erc20Abi, chainId, functionName: "approve", args: [spender, amount] }));
   }
 
   async function run(label: string, steps: (helpers: { ensureAllowance: typeof ensureAllowance }) => Promise<Hash>) {
     setState({ busy: true, message: `${label}…` });
     try {
+      if (walletChain !== chainId) {
+        setState({ busy: true, message: "Switch your wallet network…" });
+        await switchChainAsync({ chainId });
+      }
       const hash = await steps({ ensureAllowance });
       setState({ busy: true, message: `${label}: confirming…` });
       await wait(hash);
