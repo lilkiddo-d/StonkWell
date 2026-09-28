@@ -8,8 +8,8 @@ import { useDeployment } from "@/lib/deployment";
 import { fmtAmount, shortAddress } from "@/lib/format";
 import { Pill, Stat } from "./ui";
 
-// $WELL trades on the Pons launchpad. Set NEXT_PUBLIC_WELL_TRADE_URL to the token's Pons page once it is live.
-const TRADE_URL = process.env.NEXT_PUBLIC_WELL_TRADE_URL || "https://www.ponsfamily.com/launchpad";
+// $WELL trades on the Pons launchpad, whose token pages are /launchpad/<address>. NEXT_PUBLIC_WELL_TRADE_URL overrides.
+const tradeUrl = (token: string) => process.env.NEXT_PUBLIC_WELL_TRADE_URL || `https://www.ponsfamily.com/launchpad/${token}`;
 
 export function WellTokenDetails() {
   const { deployment, chainId } = useDeployment();
@@ -79,7 +79,7 @@ export function WellTokenDetails() {
             <span>{decimals ?? "…"}</span>
           </div>
           <div className="hero-cta">
-            <a className="btn btn-primary" href={TRADE_URL} target="_blank" rel="noreferrer">Trade $WELL on Pons ↗</a>
+            <a className="btn btn-primary" href={tradeUrl(deployment.wellToken)} target="_blank" rel="noreferrer">Trade $WELL on Pons ↗</a>
             <button className="btn" onClick={copy}>{copied ? "Copied" : "Copy address"}</button>
             {isConnected && (
               <button

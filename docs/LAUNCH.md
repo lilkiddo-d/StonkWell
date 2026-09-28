@@ -45,7 +45,7 @@ If it keeps failing on connection errors, try another internet connection, or se
 Commit and push `contracts/deployments/robinhood.json` and `app/src/generated/`, then merge to `main`. Netlify rebuilds and the site switches from "not live yet" to live.
 
 In Netlify's environment variables:
-- Set `NEXT_PUBLIC_WELL_TRADE_URL` to your $WELL page on Pons.
+- The "Trade $WELL on Pons" button links to your token's Pons page automatically. Nothing to set.
 - Make sure `NEXT_PUBLIC_ENABLE_LOCAL` is **not** set.
 
 ## 5. Hand control to the timelock (admin multisig)
@@ -62,7 +62,8 @@ Until step 2 is done, the deployer wallet still owns the oracle, registry and sw
 
 ## 6. Start the keeper
 
-See `keeper/README.md`. Run it in dry-run mode first (the default), then with `DRY_RUN=0` using the keeper wallet.
+In the `keeper` folder: `.\start.ps1` for a dry run (sends nothing), then `.\start.ps1 -Live`, which asks for the keeper
+wallet's key with hidden input. Its first live cycle places each Well's price range, so run it before announcing.
 
 ## Known limits at launch
 
