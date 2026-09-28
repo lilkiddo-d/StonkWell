@@ -50,7 +50,8 @@ node src/index.js --once
 DRY_RUN=0 KEEPER_PRIVATE_KEY=0x... npm start
 ```
 
-PowerShell: `$env:DRY_RUN="0"; $env:KEEPER_PRIVATE_KEY="0x..."; npm start`.
+PowerShell (recommended, on Windows): `.\start.ps1` for a dry run, `.\start.ps1 -Live` to send. It asks for the key with
+hidden input, so the key never lands in shell history or a file. Add `-Once` for a single cycle.
 
 `--once` (or `KEEPER_ONCE=1`) runs one cycle and exits with status 0, which also suits cron or a systemd timer. `SIGINT`/`SIGTERM` stop the loop after the current step.
 

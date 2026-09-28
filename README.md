@@ -74,7 +74,7 @@ $env:NEXT_PUBLIC_ENABLE_LOCAL="1"; npm run dev  # also shows the local Hardhat d
 npm run build
 ```
 
-The app reads addresses from `app/src/generated/deployments.ts`. Before a deployment is exported, it shows "not live yet" states. Set `NEXT_PUBLIC_ROBINHOOD_RPC_URL` to use a private RPC. Set `NEXT_PUBLIC_WELL_TRADE_URL` to the $WELL page on the Pons launchpad; the "Trade $WELL on Pons" button falls back to the Pons explore page.
+The app reads addresses from `app/src/generated/deployments.ts`. Before a deployment is exported, it shows "not live yet" states. Set `NEXT_PUBLIC_ROBINHOOD_RPC_URL` to use a private RPC. The "Trade $WELL on Pons" button links to the token's Pons page automatically; `NEXT_PUBLIC_WELL_TRADE_URL` overrides it.
 
 ## Launch parameters (`contracts/config/robinhood.json`)
 
