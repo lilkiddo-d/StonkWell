@@ -24,13 +24,31 @@ p { line-height: 1.6; }
 code { background: var(--bg-2); padding: 0.1em 0.35em; border-radius: 5px; font-size: 0.9em; }
 main { max-width: 1160px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; min-height: 70vh; }
 
-.header { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; gap: 2rem; padding: 1rem 1.25rem; }
+.header { position: relative; max-width: 1160px; margin: 0 auto; display: flex; align-items: center; gap: 2rem; padding: 1rem 1.25rem; }
 .brand { font-weight: 800; letter-spacing: 0.12em; color: var(--text); font-size: 1.05rem; }
 .brand:hover { text-decoration: none; }
 .brand-mark { color: var(--accent); margin-right: 0.3rem; }
 .nav { display: flex; gap: 1.4rem; flex: 1; }
 .nav a { color: var(--muted); font-weight: 500; }
 .nav a.active, .nav a:hover { color: var(--text); text-decoration: none; }
+.menu-btn { display: none; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 10px; width: 42px; height: 42px; font-size: 1.2rem; line-height: 1; cursor: pointer; flex: none; }
+.menu-btn:hover { border-color: var(--accent); }
+@media (max-width: 860px) {
+  .header { gap: 0.75rem; }
+  .brand { margin-right: auto; white-space: nowrap; }
+  .header .btn { white-space: nowrap; padding: 0.55rem 0.9rem; }
+  .menu-btn { display: inline-flex; align-items: center; justify-content: center; }
+  .nav.open {
+    display: flex; flex-direction: column; gap: 0; position: absolute; top: 100%; left: 1rem; right: 1rem; z-index: 50;
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.4rem; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  }
+  .nav.open a { padding: 0.8rem 0.9rem; border-radius: 10px; font-size: 1.05rem; }
+  .nav.open a.active { background: var(--bg-2); }
+}
+@media (max-width: 400px) {
+  .brand { font-size: 0.92rem; letter-spacing: 0.08em; }
+  .header .btn { font-size: 0.85rem; padding: 0.5rem 0.75rem; }
+}
 .footer { max-width: 1160px; margin: 0 auto; padding: 2rem 1.25rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border); }
 
 .btn { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 0.6rem 1.1rem; border-radius: 999px; font-weight: 600; cursor: pointer; font-size: 0.92rem; display: inline-block; }
