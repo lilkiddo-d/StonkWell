@@ -1,6 +1,6 @@
 # Stonkwell: audit-readiness package
 
-Audit brief for security firms and contest platforms. All statements are from the code at commit `ada482d` (branch `portfolio-page`) unless marked **pending**. File paths are relative to the repository root.
+Audit brief for security firms and contest platforms. All statements are from the code on `main` as of 2026-09-28; the final audit commit hash is provided at kickoff. File paths are relative to the repository root.
 
 ---
 
@@ -21,7 +21,7 @@ Stonkwell is a managed-liquidity protocol for Robinhood Equity Tokens (tokenized
 | USDG | `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168` (6 dec) | Asset of Well, BorrowDesk, BasketProgram | Standard ERC-20 |
 | Robinhood Equity Tokens | 18 tokens in config; launch set TSLA, NVDA, AAPL, PLTR, META | Wells | Expose `oraclePaused()` during corporate actions. `WellOracle` treats `true` as unpriced |
 | $WELL | Launched on the Pons launchpad (pons.family), ETH-paired, exposes `burn(uint256)`. Passed to the deploy script as `WELL_TOKEN_ADDRESS` | `DrawdownRetire` (`balanceOf`, `burn`) | Third-party token contract, out of scope. `WellToken.sol` is only used if no existing token is supplied |
-| Pons launchpad hook | `0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044` | **pending**, see section 3 | Third-party hook on the $WELL/ETH pool |
+| Pons launchpad hook | `0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044` | allowlisted on the swap adapter at deploy, see section 3 | Third-party hook on the $WELL/ETH pool |
 
 Toolchain: Solidity 0.8.26, `viaIR`, optimizer 200 runs, `evmVersion: cancun`. OpenZeppelin Contracts 5.1.0. `@uniswap/v4-core` 1.0.2, MIT-licensed files only (types, `TickMath`, `SqrtPriceMath`, interfaces).
 
@@ -38,7 +38,7 @@ nSLOC = non-blank, non-comment lines (NatSpec and `//` stripped), counted with a
 | `contracts/src/Well.sol` | 308 | ERC-4626 vault per Equity Token. Oracle-priced `totalAssets`, deposit cap, pause, harvest (fee split), pool-deviation check, USDG exits with exiter-borne swap loss, `redeemInKind`, keeper `rebalance` |
 | `contracts/src/BorrowDesk.sol` | 343 | Isolated Credit Line. ERC-4626 lender shares; Well-share collateral; kinked rate model; LTV, liquidation, close factor, bonus; concentration cap; bad-debt write-off (reserves first); `claimReserves` to FeeRouter |
 | `contracts/src/v4/WellPositionV4.sol` | 179 | Holds one Well's v4 range through PositionManager and Permit2. Principal valued at the oracle-implied sqrtPrice; rejects hooked pools; Well-only mutators; holds no tokens between calls |
-| `contracts/src/v4/V4SwapAdapter.sol` | 110 | Exact-input swaps via `PoolManager.unlock` through owner-registered pools only; up to 3 hops; default route direct or via hub (USDG). **Pending change in section 3** |
+| `contracts/src/v4/V4SwapAdapter.sol` | 116 | Exact-input swaps via `PoolManager.unlock` through owner-registered pools only; up to 3 hops; default route direct or via hub (USDG); hooks only when owner-allowlisted; native ETH only as an intermediate hop. See section 3 |
 | `contracts/src/programs/BasketProgram.sol` | 163 | ERC-4626 over up to 8 Wells; keeper allocate/deallocate within `maxAllocationBps`; USDG exits from idle balance only; `redeemInKind` returns USDG + Well shares |
 | `contracts/src/DrawdownRetire.sol` | 97 | Keeper swaps fee tokens to $WELL (per-token per-run cap, min interval, `minWellOut > 0`) and burns all $WELL held; no withdrawal path |
 | `contracts/src/WellOracle.sol` | 95 | Chainlink reader: staleness, positivity, USDG/USD conversion, `oraclePaused()` corporate-action gate, optional sequencer check; `isFresh` never reverts |
@@ -52,7 +52,7 @@ nSLOC = non-blank, non-comment lines (NatSpec and `//` stripped), counted with a
 
 Interfaces without logic, listed for reference and not counted: `interfaces/ISwapAdapter.sol` (11), `IWellOracle.sol` (6), `IWellPosition.sol` (11), `AggregatorV3Interface.sol` (14). Their NatSpec states behavioural expectations that the implementations must meet (for example "callers must enforce their own minimum output").
 
-**Pending addition to scope:** the V4SwapAdapter changes in section 3. They are not yet in the code, and the scope must include them once added.
+The V4SwapAdapter hook allowlist and native-ETH hop (section 3) are implemented and in scope.
 
 ### Out of scope
 
@@ -64,11 +64,11 @@ Interfaces without logic, listed for reference and not counted: `interfaces/ISwa
 
 ---
 
-## 3. Planned change: hook allowlist and native-ETH hop in V4SwapAdapter
+## 3. Hook allowlist and native-ETH hop in V4SwapAdapter (implemented)
 
-> **Status: PENDING. This change is not in the audited commit yet, and the audit scope must include it once added.** The owner has not yet signed off on implementing it. The description below is the intended design. Please review both the design and the code once it lands.
+> **Status: implemented** in `contracts/src/v4/V4SwapAdapter.sol` (`setHookAllowed`, `hookAllowed`, `_hookOk`). Unit tests: `test/unit/V4SwapAdapter.test.js`. Fork test against a live graduated Pons pool: `test/fork/PonsRoute.fork.test.js` (USDG → native ETH → Pons token, including `DrawdownRetire.drawdown` end to end, minOut, and revocation). Please review both the design and the code.
 
-**Why.** $WELL was launched on the Pons launchpad (pons.family). On graduation it trades in a Uniswap v4 pool:
+**Why.** $WELL is launched on the Pons launchpad (pons.family). On graduation it trades in a Uniswap v4 pool:
 
 | PoolKey field | Value |
 |---|---|
@@ -78,9 +78,9 @@ Interfaces without logic, listed for reference and not counted: `interfaces/ISwa
 | tickSpacing | 200 |
 | hooks | Pons launchpad hook `0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044` |
 
-With the current code, `V4SwapAdapter.setPool` reverts `InvalidPool` for this key for two reasons: `currency0 == address(0)`, and `hooks != address(0)`. The buy-and-burn therefore has no route into $WELL (see section 6, K-1).
+Before this change, `V4SwapAdapter.setPool` rejected this key for two reasons: `currency0 == address(0)`, and `hooks != address(0)`, so the buy-and-burn had no route into $WELL.
 
-**Intended design**
+**Design (as implemented)**
 
 1. `setHookAllowed(address hook, bool allowed)`, `onlyOwner` (so it runs through the 48h timelock after `acceptOwnership`). It stores an allowlist and emits an event.
 2. `setPool(key)` accepts `key.hooks == address(0)` **or** an allowlisted hook. All other existing checks stay.
@@ -88,7 +88,9 @@ With the current code, `V4SwapAdapter.setPool` reverts `InvalidPool` for this ke
 4. Native ETH (`address(0)`) may appear only as an **intermediate** hop in a path (for example `[USDG, ETH, WELL]` or `[EquityToken, USDG, ETH, WELL]`). It is never allowed as `tokenIn` or `tokenOut`, so the adapter never settles or takes native currency, and the existing ERC-20 `sync/transfer/settle` and `take` logic stays valid. Setting `setPool` for an ETH-paired pool requires relaxing the `c0 != address(0)` check for that case only.
 5. `WellPositionV4` is **not** changed. Well liquidity positions still reject hooked pools.
 
-**Deployment consequence.** Drawdowns into $WELL also need a hookless USDG/ETH (or Equity/ETH) pool registered for the first leg. The default route (`_defaultPath`) goes through the USDG hub only, so the keeper must pass an explicit `route` for ETH-hop paths. `MAX_HOPS = 3` allows `[Equity, USDG, ETH, WELL]`.
+**Deployment.** `scripts/deploy.js` (live path) allowlists the Pons hook and registers the hookless ETH/USDG pool (fee 100, tickSpacing 1; the deepest of the four hookless tiers, all within 0.5% of each other in price) while the deployer still owns the adapter. The $WELL/ETH pool itself only exists after graduation and is registered with `scripts/register-well-pool.js`, which verifies the pool is initialized with liquidity and prints the transaction (direct from the deployer before the handoff, a timelock schedule/execute pair after). The default route (`_defaultPath`) goes through the USDG hub only, so the keeper passes an explicit `route` for ETH-hop paths; `MAX_HOPS = 3` allows `[Equity, USDG, ETH, WELL]`.
+
+**Observed on a fork (2026-09-28, APES pool as a stand-in):** 100 USDG bought ~5.5% below the pool's spot and 500 USDG ~23% below, in a pool holding ~4 ETH. Pons pools graduate with identical liquidity (~2.93e22), so price impact depends only on the run size; `DrawdownRetire.maxInputPerRun` is the bound and should stay small relative to the $WELL pool. The drawdown quote comes from the same pool it trades in, so it protects against movement before inclusion, not against a manipulated pool; `minWellOut` and `maxInputPerRun` are the only limits on the price paid.
 
 **What we ask auditors to review specifically for the Pons hook**
 
@@ -126,7 +128,7 @@ Under v4's address-encoded permissions, the low 14 bits of `0x…F044` (`0x3044`
 | **DrawdownRetire** | `setInputLimit` (unbounded); `setMinInterval` (unbounded, can be 0); `resume`; grant/revoke roles | `halt` | `drawdown(tokenIn, amountIn, minWellOut, route)`: `amountIn ≤ maxInputPerRun[tokenIn]`, `minWellOut > 0`, `tokenIn != $WELL`, spacing ≥ `minInterval` | `retireHeld` |
 | **FeeRouter** (Ownable2Step; owner = timelock from the constructor) | `proposeDestination` → wait `CHANGE_DELAY` (48h) → `executeDestination`; `cancelDestination`. Effective delay is 96h+ (timelock plus internal delay) | — | — | `route`, `routeMany` |
 | **WellOracle** (Ownable2Step) | `setFeed(token, aggregator, maxAge)` (any `maxAge > 0`); `setSequencerFeed` (can be set to zero to disable). `usdgFeed` and `usdgMaxAge` are immutable | — | — | views |
-| **V4SwapAdapter** (Ownable2Step) | `setPool(key)` (hookless, `c0 != 0`, `c0 < c1`; overwrites the existing pair). **Pending:** `setHookAllowed` | — | — | `swap` (anyone may swap through registered pools) |
+| **V4SwapAdapter** (Ownable2Step) | `setPool(key)` (`c0 < c1`; hook zero or allowlisted; native ETH allowed as `currency0`; overwrites the existing pair), `setHookAllowed(hook, bool)` | — | — | `swap` (anyone may swap through registered pools) |
 | **BasketProgram** | `listWell` (≤ 8, same asset); `delistWell` (only if none held); `setHeldValueCap`; `setMaxAllocationBps` (1–10000); `unpause`; grant/revoke roles | `pause` (blocks `deposit`, `mint`, `allocate`); `lowerHeldValueCap` | `allocate` (listed Wells, ceiling checked after deposit); `deallocate` | `deposit`/`mint` (cap starts at 0), `withdraw`/`redeem` (idle USDG only), `redeemInKind` |
 | **WellRegistry** (Ownable2Step) | `list`, `delist` | — | — | `entries()` |
 | **WellPositionV4** | — (no admin). `bind(well)` once, by the deployer | — | — | views. All mutators are `onlyWell` |
@@ -176,7 +178,7 @@ Under v4's address-encoded permissions, the low 14 bits of `0x…F044` (`0x3044`
 | I-19 | Guardian actions only tighten: `pause`, `halt`, `lower*Cap` (reverts if raising) | all guardian functions |
 | I-20 | ERC-4626 inflation resistance: `_decimalsOffset = 6` on Well, BorrowDesk and BasketProgram (plus seeding each Well at launch) | `_decimalsOffset` |
 | I-21 | BasketProgram per-Well allocation ≤ `maxAllocationBps` of total assets after each `allocate` | `BasketProgram.allocate` |
-| **Pending** P-1 | The adapter never routes through a pool whose hook is not currently allowlisted, and never has native ETH as `tokenIn`/`tokenOut` | section 3 |
+| I-22 | The adapter never routes through a pool whose hook is not currently allowlisted (checked per hop at swap time, so revoking a hook blocks existing registrations), and never has native ETH as `tokenIn`/`tokenOut` | `V4SwapAdapter._hookOk`, `swap`, `unlockCallback` |
 
 ---
 
@@ -188,7 +190,7 @@ Please do not report these as findings unless you show an impact beyond what is 
 
 | ID | Issue | Status |
 |---|---|---|
-| K-1 | **Buy-and-burn cannot reach $WELL with the current code.** $WELL's pool is ETH-paired and hooked (section 3). `V4SwapAdapter.setPool` rejects both `currency0 == address(0)` and any hook, so no route to $WELL can be registered, and `drawdown` reverts (`InvalidRoute`) until the pending change lands. Fees accumulate in `DrawdownRetire` meanwhile. They cannot leave by any other path | Accepted until the section 3 change |
+| K-1 | **Buy-and-burn activates only after $WELL graduates on Pons.** The $WELL/ETH pool does not exist until then, so it cannot be registered at deploy; `drawdown` reverts (`InvalidRoute`) and fees accumulate in `DrawdownRetire`, which they cannot leave by any other path. Once the pool is live, `scripts/register-well-pool.js` prints the registration transaction (deployer before the timelock handoff, timelock after). The keeper detects the revert in its quote and skips | Accepted; expected to last days |
 | K-2 | **Fixed:** BorrowDesk reserves were not written down on a bad-debt write-off. Reserves booked on never-collected interest could exceed backing and be claimed out of later lenders' deposits | Fixed in `c8dc280` (`reserves -= min(reserves, written)`), with tests |
 | K-3 | `WellRegistry.delist` keeps `indexPlusOne` set, so a delisted target can never be listed again (`AlreadyListed`). `delist` does not check `listed`, so a double delist succeeds and emits `Delisted` twice | Accepted (informational registry; covered by a test) |
 | K-4 | `BorrowDesk.release` with `shares > collateralShares` reverts with `ZeroAmount`, a misleading error name | Accepted (cosmetic) |
@@ -306,10 +308,8 @@ From `contracts/scripts/deploy.js` (`npm run deploy:robinhood`), with env `DEPLO
 
 1. The admin multisig calls `timelock.schedule(...)` (or `scheduleBatch`) for `acceptOwnership()` on `WellOracle`, `WellRegistry` and `V4SwapAdapter`. After 48h, it calls `execute`. **Until then the deployer key owns these three (K-14),** so retire the key as soon as the transfers are started.
 2. Seed each Well with a small deposit, then the keeper calls the first `rebalance`.
-3. **$WELL burn activation (requires the pending section 3 change and a redeploy or upgrade of `V4SwapAdapter`).**
-   - Batch through the timelock: `adapter.setHookAllowed(0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044, true)`; `adapter.setPool({currency0: ETH (0x0), currency1: WELL, fee: 0, tickSpacing: 200, hooks: 0xE5e7…e044})`; `adapter.setPool(<hookless USDG/ETH pool>)`.
-   - The keeper then calls `drawdown(USDG, ≤ 5,000 USDG, minWellOut, abi.encode([USDG, ETH, WELL]))`, and Equity Token inputs use `[Equity, USDG, ETH, WELL]`.
-   - `DrawdownRetire.swapAdapter` is immutable, so if the adapter is redeployed rather than already containing the change, `DrawdownRetire` and every `Well` (whose `swapAdapter` is also immutable) must be redeployed with it. The team intends to land the change **before** mainnet deployment so this does not arise.
+3. **$WELL burn activation** (after $WELL graduates on Pons). The hook allowlist and the ETH/USDG leg are set by the deploy script. `scripts/register-well-pool.js` then prints `adapter.setPool({currency0: ETH (0x0), currency1: WELL, fee: 0, tickSpacing: 200, hooks: 0xE5e7…e044})`: a direct deployer transaction before the handoff, a timelock schedule/execute pair after it.
+   - The keeper then calls `drawdown(USDG, ≤ maxInputPerRun, minWellOut, abi.encode([USDG, ETH, WELL]))`, and Equity Token inputs use `[Equity, USDG, ETH, WELL]`. Until the pool is registered, its quote reverts and it skips.
 4. Set the sequencer-uptime feed when Chainlink publishes one.
 5. Raise caps gradually. Open BasketProgram with `setHeldValueCap` through the timelock.
 
@@ -317,7 +317,7 @@ From `contracts/scripts/deploy.js` (`npm run deploy:robinhood`), with env `DEPLO
 
 ## 9. Areas of concern (ranked)
 
-1. **Pending V4SwapAdapter hook allowlist and ETH hop, and the Pons hook interaction** (section 3). This is new code interacting with a third-party hook that has `afterSwapReturnDelta`, on the only path to $WELL. The drawdown path has no oracle bound.
+1. **V4SwapAdapter hook allowlist and ETH hop, and the Pons hook interaction** (section 3). This is new code interacting with a third-party hook that has `afterSwapReturnDelta`, on the only path to $WELL. The drawdown path has no oracle bound.
 2. **`Well` exit accounting.** `withdraw` share math (`assets + loss` over `valueBefore`), `redeem` net payout, `_pullUsdg` sizing (`withdrawPortion(min(needed, positionValue), positionValue)`), and rounding directions. Can an exiter shift swap loss or rounding onto remaining holders, or extract value by combining `deposit` → `withdraw` / `redeemInKind` around harvests?
 3. **`WellPositionV4` and `V4PoolMath`.** Oracle-implied valuation versus spot-based liquidity sizing in `enter` (`b0 - 1`, `b1 - 1`, `uint128` casts). `sqrtPriceFromAmounts` clamping and precision for 18-decimal Equity versus 6-decimal USDG in both token orders. `POOLS_SLOT` extsload correctness. Fee versus principal separation (`collectFees` before `withdrawPortion`). PositionManager action encoding.
 4. **`BorrowDesk` accounting.** Interest accrual (`_projected` uses pre-accrual utilization), `debtScaled` rounding (ceil on borrow, floor on reduce, zeroing in `_reduceDebt`), liquidation seize and repay math when collateral is insufficient, the bad-debt and reserves path (K-2 fix), and whether `totalDebt` can drift from the sum of account debts.
@@ -333,6 +333,6 @@ From `contracts/scripts/deploy.js` (`npm run deploy:robinhood`), with env `DEPLO
 ## 10. Contact
 
 - Point of contact: **[Your name / Telegram / email]**
-- Repository: **[repo link]** (audit commit: `ada482d` plus the pending section 3 change, with the final commit hash to be provided at kickoff)
+- Repository: **[repo link]** (audit commit: final hash provided at kickoff)
 - Preferred report format: Markdown or PDF with severity, affected file and line, and a proof-of-concept (a Hardhat test is preferred)
 - Existing docs: `README.md`, `docs/OVERVIEW.md`, `docs/ARCHITECTURE.md`, `docs/RISK_REVIEW.md`

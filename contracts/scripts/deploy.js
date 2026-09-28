@@ -60,6 +60,15 @@ async function main() {
     ? await deploy("V4SwapAdapter", [deployer.address, config.uniswap.poolManager, env.usdg])
     : env.swap;
   out.swapAdapter = await swap.getAddress();
+  if (LIVE) {
+    // Buy-and-burn route: fee token → USDG → native ETH → $WELL. The $WELL / ETH pool is a Pons launchpad pool
+    // (hooked), registered after $WELL graduates with scripts/register-well-pool.js; the hook and the hookless
+    // ETH / USDG leg are set now while the deployer still owns the adapter.
+    await (await swap.setHookAllowed(config.pons.hook, true)).wait();
+    const eth = config.uniswap.ethUsdgPool;
+    await (await swap.setPool({ currency0: ethers.ZeroAddress, currency1: env.usdg, fee: eth.fee, tickSpacing: eth.tickSpacing, hooks: ethers.ZeroAddress })).wait();
+    console.log(`  Pons hook allowed, ETH/USDG ${eth.fee}/${eth.tickSpacing} pool registered`);
+  }
 
   const drawdown = await deploy("DrawdownRetire", [
     wellToken,
