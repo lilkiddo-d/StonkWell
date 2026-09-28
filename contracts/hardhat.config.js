@@ -26,6 +26,8 @@ module.exports = {
         forking: { url: RPC, ...(FORK_BLOCK && { blockNumber: Number(FORK_BLOCK) }) },
       }),
     },
+    // Local node on a separate port, used by the keeper bot's tests (keeper/README.md).
+    keeper: { url: "http://127.0.0.1:8547" },
     robinhood: {
       url: RPC,
       chainId: 4663,
