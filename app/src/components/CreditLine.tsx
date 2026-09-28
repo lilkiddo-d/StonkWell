@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { erc20Abi, formatUnits, type Address } from "viem";
+import { erc20Abi, formatUnits, maxUint256, type Address } from "viem";
 import { useAccount, useReadContracts } from "wagmi";
 import { borrowDeskAbi, wellAbi } from "@/generated/abis";
 import { explorerAddress } from "@/lib/chains";
@@ -28,6 +28,8 @@ export function CreditLine({ ticker, desk, well, usdg }: { ticker: string; desk:
       { ...d, functionName: "supplyCap" },
       { ...d, functionName: "borrowCap" },
       { ...d, functionName: "paused" },
+      { ...d, functionName: "totalCollateralShares" },
+      { address: well, abi: wellAbi, functionName: "totalSupply" },
     ],
   });
   const acctQ = useReadContracts({
@@ -42,6 +44,7 @@ export function CreditLine({ ticker, desk, well, usdg }: { ticker: string; desk:
       { ...d, functionName: "healthFactor", args: [address!] },
       { address: well, abi: wellAbi, functionName: "balanceOf", args: [address!] },
       { address: usdg, abi: erc20Abi, functionName: "balanceOf", args: [address!] },
+      { ...d, functionName: "maxDeposit", args: [address!] },
     ],
   });
   const g = <T,>(src: readonly { status: string; result?: unknown }[] | undefined, i: number) =>
@@ -57,6 +60,15 @@ export function CreditLine({ ticker, desk, well, usdg }: { ticker: string; desk:
   const health = g<bigint>(a, 5);
   const wellShares = g<bigint>(a, 6);
   const usdgBal = g<bigint>(a, 7);
+  const maxDeposit = g<bigint>(a, 8);
+  const totalPledged = g<bigint>(data, 10);
+  const wellSupply = g<bigint>(data, 11);
+  // pledge() caps all pledged shares at maxCollateralShareBps of the Well's supply.
+  const pledgeRoom =
+    risk && totalPledged !== undefined && wellSupply !== undefined
+      ? (() => { const cap = (wellSupply * BigInt(risk[4])) / 10_000n; return cap > totalPledged ? cap - totalPledged : 0n; })()
+      : undefined;
+  const min = (x: bigint | undefined, y: bigint | undefined) => (x === undefined || y === undefined ? undefined : x < y ? x : y);
 
   const [tab, setTab] = useState<Tab>("Lend");
   const [amount, setAmount] = useState("");
@@ -65,11 +77,11 @@ export function CreditLine({ ticker, desk, well, usdg }: { ticker: string; desk:
   const decimals = isShares ? WELL_SHARE_DECIMALS : USDG_DECIMALS;
   const parsed = safeParse(amount, decimals);
   const limit: bigint | undefined = {
-    Lend: usdgBal,
+    Lend: min(usdgBal, maxDeposit),
     Withdraw: lent,
-    Pledge: wellShares,
+    Pledge: min(wellShares, pledgeRoom),
     Borrow: borrowable,
-    Repay: debt !== undefined && usdgBal !== undefined ? (debt < usdgBal ? debt : usdgBal) : undefined,
+    Repay: min(debt, usdgBal),
     Release: pledged,
   }[tab];
 
@@ -89,8 +101,11 @@ export function CreditLine({ ticker, desk, well, usdg }: { ticker: string; desk:
       }),
       Borrow: () => tx.run("Borrowing", () => w({ ...d, functionName: "borrow", args: [parsed, me] })),
       Repay: () => tx.run("Repaying", async ({ ensureAllowance }) => {
-        await ensureAllowance(usdg, desk, parsed);
-        return w({ ...d, functionName: "repay", args: [parsed, me] });
+        // Interest accrues until the tx lands, so repaying the displayed debt would leave dust that blocks
+        // Release. Repaying in full sends maxUint256 (the desk caps it at debtOf) with a small allowance buffer.
+        const full = debt !== undefined && parsed >= debt;
+        await ensureAllowance(usdg, desk, full ? parsed + parsed / 1000n + 1n : parsed);
+        return w({ ...d, functionName: "repay", args: [full ? maxUint256 : parsed, me] });
       }),
       Release: () => tx.run("Releasing", () => w({ ...d, functionName: "release", args: [parsed, me] })),
     };

@@ -8,6 +8,8 @@ import { wellAbi, wellOracleAbi } from "@/generated/abis";
 const ONE_SHARE = 10n ** 12n;
 const YIELD_WINDOW_BLOCKS = 200_000n;
 const YEAR = 365 * 24 * 3600;
+// Annualizing fees from a few minutes of history gives absurd rates (a young chain or fresh deployment).
+const MIN_YIELD_SECONDS = 3600;
 
 export function useWellStats(well: Address | undefined) {
   const w = { address: well, abi: wellAbi } as const;
@@ -81,7 +83,7 @@ export function useYieldRate(well: Address | undefined, heldValue: bigint | unde
         client!.getBlock({ blockNumber: from }),
       ]);
       const seconds = Number(latest.timestamp - first.timestamp);
-      if (seconds <= 0 || !heldValue) return null;
+      if (seconds < MIN_YIELD_SECONDS || !heldValue) return null;
       let usdg = 0n;
       let equity = 0n;
       for (const l of logs) {
