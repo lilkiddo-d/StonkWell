@@ -24,7 +24,6 @@ p { line-height: 1.6; }
 code { background: var(--bg-2); padding: 0.1em 0.35em; border-radius: 5px; font-size: 0.9em; }
 main { max-width: 1160px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; min-height: 70vh; }
 
-.risk-banner { background: #1a1608; color: #e9d9a6; font-size: 0.8rem; padding: 0.5rem 1.25rem; text-align: center; border-bottom: 1px solid #3a3113; }
 .header { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; gap: 2rem; padding: 1rem 1.25rem; }
 .brand { font-weight: 800; letter-spacing: 0.12em; color: var(--text); font-size: 1.05rem; }
 .brand:hover { text-decoration: none; }

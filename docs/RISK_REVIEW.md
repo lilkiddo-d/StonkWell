@@ -42,7 +42,7 @@ This is an internal pre-audit note. It covers the three areas in the brief (orac
 
 - **Oracle only.** Well shares are valued as `convertToAssets(shares)`. `totalAssets` prices the position's principal at the oracle-implied sqrtPrice, not at pool spot, so a flash-loan move of the v4 pool does not change collateral value.
 - **Haircuts.** The META Credit Line launches with a 40% maximum LTV, a 55% liquidation threshold, a 6% bonus and a 50% close factor. A position opened at maximum LTV survives a roughly 27% fall in the collateral price before it can be liquidated.
-- **Monday-open gap.** Liquidation needs a fresh price, so liquidations wait over weekends and the first fresh print can already be past the threshold. Bad debt is written off pro rata against lenders if collateral hits zero. The conservative LTV and the concentration cap (`maxCollateralShareBps` = 30% of a Well's supply per Credit Line) bound this.
+- **Monday-open gap.** Liquidation needs a fresh price, so liquidations wait over weekends and the first fresh print can already be past the threshold. Bad debt is written off if collateral hits zero: first against the Credit Line's reserves (which were booked on the same uncollected interest), then pro rata against lenders. The conservative LTV and the concentration cap (`maxCollateralShareBps` = 30% of a Well's supply per Credit Line) bound this.
 - **Liquidity of collateral.** Liquidators receive Well shares, not USDG. When feeds are stale they can still `redeemInKind` and sell the Equity Token elsewhere, so the liquidation path does not depend on the Well's USDG exit.
 - **Reflexivity.** Large liquidations followed by USDG exits sell Equity Token into the same pool. The concentration cap and per-Well Held Value caps limit how large this can get.
 
@@ -65,4 +65,4 @@ This is an internal pre-audit note. It covers the three areas in the brief (orac
 3. Seed each Well; launch with a $25k Held Value cap per Well.
 4. Create and register a $WELL/USDG pool and set drawdown input limits.
 5. Set the sequencer-uptime feed once Chainlink publishes one.
-6. Complete a legal review of `DISCLAIMER.md` and add geofencing to the hosted interface.
+6. Complete a legal review before opening to the public.

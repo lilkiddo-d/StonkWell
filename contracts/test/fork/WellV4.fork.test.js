@@ -31,7 +31,8 @@ describe(`Well on a Robinhood Chain fork (${TICKER}/USDG)`, function () {
       config.chainlink.usdgMaxAge,
       6,
     ]);
-    await oracle.setFeed(t.address, t.chainlinkFeed, config.chainlink.equityMaxAge);
+    // Equity feeds stop updating while the market is closed. FORK_EQUITY_MAX_AGE (seconds) lets the suite run on weekends.
+    await oracle.setFeed(t.address, t.chainlinkFeed, process.env.FORK_EQUITY_MAX_AGE || config.chainlink.equityMaxAge);
 
     const [c0, c1] = BigInt(t.address) < BigInt(config.tokens.usdg.address)
       ? [t.address, config.tokens.usdg.address]

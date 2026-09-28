@@ -336,6 +336,9 @@ contract BorrowDesk is ERC4626, AccessControl, Pausable, ReentrancyGuard {
             if (written != 0) {
                 _reduceDebt(account, written);
                 badDebt += written;
+                // Reserves were booked on interest inside this debt and never collected; they absorb the
+                // loss first, so they can never exceed what backs them and eat into later lenders' deposits.
+                reserves -= Math.min(reserves, written);
             }
         }
         IERC20(address(well)).safeTransfer(receiver, seized);

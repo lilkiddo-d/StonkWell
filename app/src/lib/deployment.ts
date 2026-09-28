@@ -2,10 +2,14 @@
 
 import { useAccount } from "wagmi";
 import { deployments, type Deployment } from "@/generated/deployments";
-import { defaultChainId } from "./wagmi";
+import { defaultChainId, wagmiConfig } from "./wagmi";
 
-export function useDeployment(): { deployment: Deployment | null; chainId: number } {
+export type AppChainId = (typeof wagmiConfig)["chains"][number]["id"];
+
+/// The deployment to show, and the chain it lives on. Reads and writes must target this chain, not
+/// whatever network the wallet happens to be on, or they hit addresses that don't exist there.
+export function useDeployment(): { deployment: Deployment | null; chainId: AppChainId } {
   const { chainId: walletChain } = useAccount();
-  const chainId = walletChain && deployments[walletChain] ? walletChain : defaultChainId;
+  const chainId = (walletChain && deployments[walletChain] ? walletChain : defaultChainId) as AppChainId;
   return { deployment: deployments[chainId] ?? null, chainId };
 }

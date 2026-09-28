@@ -5,7 +5,6 @@ Managed, oracle-guarded liquidity for Equity Tokens on Robinhood Chain. You sink
 - [`docs/OVERVIEW.md`](docs/OVERVIEW.md): full project write-up (what it is, how it works, economics, safety, status, roadmap)
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): one-page, contract-by-contract mapping from TickerSpring to Stonkwell
 - [`docs/RISK_REVIEW.md`](docs/RISK_REVIEW.md): oracle staleness, guardian permissions, collateral valuation, and other findings
-- [`docs/DISCLAIMER.md`](docs/DISCLAIMER.md): user-facing disclaimer (draft for legal review)
 
 ## Layout
 
@@ -57,6 +56,7 @@ ADMIN_MULTISIG=0x...      # proposer/executor of the 48h timelock
 GUARDIAN_MULTISIG=0x...   # must differ from admin
 KEEPER_ADDRESS=0x...
 TREASURY_MULTISIG=0x...   # receives the fixed $WELL supply
+WELL_TOKEN_ADDRESS=0x...  # optional: use an already-deployed $WELL (18 decimals, must support burn(uint256))
 npm run deploy:robinhood
 npm run export-abis
 ```
@@ -73,7 +73,7 @@ $env:NEXT_PUBLIC_ENABLE_LOCAL="1"; npm run dev  # also shows the local Hardhat d
 npm run build
 ```
 
-The app reads addresses from `app/src/generated/deployments.ts`. Before a deployment is exported, it shows "not live yet" states. Set `NEXT_PUBLIC_ROBINHOOD_RPC_URL` to use a private RPC.
+The app reads addresses from `app/src/generated/deployments.ts`. Before a deployment is exported, it shows "not live yet" states. Set `NEXT_PUBLIC_ROBINHOOD_RPC_URL` to use a private RPC. Set `NEXT_PUBLIC_WELL_TRADE_URL` to the $WELL page on the Pons launchpad; the "Trade $WELL on Pons" button falls back to the Pons explore page.
 
 ## Launch parameters (`contracts/config/robinhood.json`)
 

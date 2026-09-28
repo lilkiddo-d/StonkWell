@@ -181,7 +181,7 @@ The remaining Equity Tokens (AMD, AMZN, MSFT, GOOGL and others) are listed in th
 | Mainnet-fork tests on the live Uniswap v4 META/USDG pool | ✅ 5 passing: deposit, rebalance, trading fees, 70/30 harvest, USDG and in-kind exits |
 | Deploy script | ✅ Dry-run against a mainnet fork with real addresses |
 | Web app | ✅ Builds; running locally against a seeded demo chain |
-| Docs | ✅ Architecture, risk review, disclaimer, README, this overview |
+| Docs | ✅ Architecture, risk review, README, this overview |
 | Independent audit | ⏳ Not started |
 | Mainnet deployment | ⏳ Not deployed |
 
@@ -195,7 +195,7 @@ The remaining Equity Tokens (AMD, AMZN, MSFT, GOOGL and others) are listed in th
 4. **Seed and open.** Seed each launch Well and open it at a $25k cap.
 5. **Activate the burn.** Create a $WELL/USDG pool and register it, so drawdowns can start retiring $WELL.
 6. **Harden.** Add Chainlink's sequencer-uptime check once a feed is published for the chain.
-7. **Legal.** Get counsel review of the disclaimer; geofence the hosted site (no US persons or restricted jurisdictions).
+7. **Legal.** Get counsel review before opening to the public.
 8. **Grow.** Raise caps gradually, add Wells and Credit Lines, then open Programs.
 
 ### Planned Programs
@@ -212,9 +212,8 @@ The remaining Equity Tokens (AMD, AMZN, MSFT, GOOGL and others) are listed in th
 - **Weekend gaps.** Prices can jump when markets reopen, which can trigger liquidations on Credit Lines.
 - **Smart-contract risk.** Tests and audits reduce risk but don't remove it.
 - **Dependencies.** Chainlink, Uniswap v4, USDG, the Equity Token contracts and the Robinhood Chain sequencer are all third parties.
-- **Restricted access.** Not offered to US persons or restricted jurisdictions.
 
-Full details: [`RISK_REVIEW.md`](RISK_REVIEW.md) and [`DISCLAIMER.md`](DISCLAIMER.md).
+Full details: [`RISK_REVIEW.md`](RISK_REVIEW.md).
 
 ---
 

@@ -4,13 +4,17 @@ import { useQuery } from "@tanstack/react-query";
 import { erc20Abi, parseAbiItem, type Address } from "viem";
 import { useAccount, usePublicClient, useReadContracts } from "wagmi";
 import { wellAbi, wellOracleAbi } from "@/generated/abis";
+import { useDeployment } from "@/lib/deployment";
 
 const ONE_SHARE = 10n ** 12n;
 const YIELD_WINDOW_BLOCKS = 200_000n;
 const YEAR = 365 * 24 * 3600;
+// Annualizing fees from a few minutes of history gives absurd rates (a young chain or fresh deployment).
+const MIN_YIELD_SECONDS = 3600;
 
 export function useWellStats(well: Address | undefined) {
-  const w = { address: well, abi: wellAbi } as const;
+  const { chainId } = useDeployment();
+  const w = { address: well, abi: wellAbi, chainId } as const;
   const { data, isLoading } = useReadContracts({
     allowFailure: true,
     query: { enabled: Boolean(well) },
@@ -47,15 +51,16 @@ export function useWellStats(well: Address | undefined) {
 
 export function useWellAccount(well: Address | undefined, usdg: Address | undefined) {
   const { address } = useAccount();
+  const { chainId } = useDeployment();
   const enabled = Boolean(well && usdg && address);
   const { data } = useReadContracts({
     allowFailure: true,
     query: { enabled },
     contracts: [
-      { address: well, abi: wellAbi, functionName: "balanceOf", args: [address!] },
-      { address: well, abi: wellAbi, functionName: "maxWithdraw", args: [address!] },
-      { address: well, abi: wellAbi, functionName: "maxDeposit", args: [address!] },
-      { address: usdg, abi: erc20Abi, functionName: "balanceOf", args: [address!] },
+      { address: well, abi: wellAbi, chainId, functionName: "balanceOf", args: [address!] },
+      { address: well, abi: wellAbi, chainId, functionName: "maxWithdraw", args: [address!] },
+      { address: well, abi: wellAbi, chainId, functionName: "maxDeposit", args: [address!] },
+      { address: usdg, abi: erc20Abi, chainId, functionName: "balanceOf", args: [address!] },
     ],
   });
   const r = (i: number) => (data?.[i]?.status === "success" ? (data[i].result as bigint) : undefined);
@@ -68,9 +73,10 @@ const feesHarvested = parseAbiItem(
 
 /// Yield Rate: depositor-share fees harvested over a recent block window, annualized against current Held Value.
 export function useYieldRate(well: Address | undefined, heldValue: bigint | undefined, equityToken?: Address, oracle?: Address) {
-  const client = usePublicClient();
+  const { chainId } = useDeployment();
+  const client = usePublicClient({ chainId });
   return useQuery({
-    queryKey: ["yieldRate", well, heldValue?.toString()],
+    queryKey: ["yieldRate", chainId, well, heldValue?.toString()],
     enabled: Boolean(client && well && heldValue && equityToken && oracle),
     refetchInterval: 120_000,
     queryFn: async (): Promise<number | null> => {
@@ -81,7 +87,7 @@ export function useYieldRate(well: Address | undefined, heldValue: bigint | unde
         client!.getBlock({ blockNumber: from }),
       ]);
       const seconds = Number(latest.timestamp - first.timestamp);
-      if (seconds <= 0 || !heldValue) return null;
+      if (seconds < MIN_YIELD_SECONDS || !heldValue) return null;
       let usdg = 0n;
       let equity = 0n;
       for (const l of logs) {
