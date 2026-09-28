@@ -8,6 +8,9 @@ import { useDeployment } from "@/lib/deployment";
 import { fmtAmount, shortAddress } from "@/lib/format";
 import { Pill, Stat } from "./ui";
 
+// $WELL trades on the Pons launchpad. Set NEXT_PUBLIC_WELL_TRADE_URL to the token's Pons page once it is live.
+const TRADE_URL = process.env.NEXT_PUBLIC_WELL_TRADE_URL || "https://www.ponsfamily.com/launchpad";
+
 export function WellTokenDetails() {
   const { deployment } = useDeployment();
   const { isConnected } = useAccount();
@@ -74,10 +77,11 @@ export function WellTokenDetails() {
             <span>{decimals ?? "…"}</span>
           </div>
           <div className="hero-cta">
+            <a className="btn btn-primary" href={TRADE_URL} target="_blank" rel="noreferrer">Trade $WELL on Pons ↗</a>
             <button className="btn" onClick={copy}>{copied ? "Copied" : "Copy address"}</button>
             {isConnected && (
               <button
-                className="btn btn-primary"
+                className="btn"
                 disabled={!symbol || isPending}
                 onClick={() => watchAsset({ type: "ERC20", options: { address: deployment.wellToken, symbol: symbol!, decimals: d } })}
               >
