@@ -116,49 +116,75 @@ export function YourHoldings() {
   const activeDesks = deskRows.filter((d) => d.lent || d.collateral || d.debt);
 
   return (
-    <div className="card">
-      <h2>Your holdings</h2>
+    <div className="stack">
       {unreachable && (
-        <p className="tx-status error">Couldn&apos;t read your positions from the network. Check your connection or RPC and try again.</p>
+        <p className="tx-status error" style={{ margin: 0 }}>Couldn&apos;t read your positions from the network. Check your connection or RPC and try again.</p>
       )}
-      <div className="stats-grid">
+      <div className="strip three">
+        <Stat label="Net position" value={fmtUsdg(netValue)} hint={loaded && !priced ? "unavailable while prices are stale" : "Wells + lent − debt"} />
+        <Stat label="Credit Line debt" value={fmtUsdg(totalDebt)} hint={totalDebt ? "repay any time" : "no open debt"} />
         <Stat label="$WELL balance" value={fmtAmount(wellBalance, wellDecimals, 2)} hint={supplyPct} />
-        <Stat label="Net position value" value={fmtUsdg(netValue)} hint={loaded && !priced ? "Unavailable while prices are stale (market closed)" : "Wells, Basket and Credit Lines, less debt"} />
-        <Stat label="Credit Line debt" value={fmtUsdg(totalDebt)} />
       </div>
 
-      <h3 className="section-title">Wells</h3>
-      {loadingLists || unreachable ? (
-        <p className="muted small">{unreachable ? "Unavailable" : "Loading…"}</p>
-      ) : heldWells.length === 0 ? (
-        <p className="muted small">No Well shares yet. <Link href="/wells">Browse Wells</Link></p>
-      ) : null}
-      {heldWells.map((w) => (
-        <div key={w.ticker} className="kv">
-          <span><Link href={`/wells/${w.ticker}`}>{w.ticker} Well</Link> · {fmtAmount(w.shares, WELL_SHARE_DECIMALS, 4)} w{w.ticker}</span>
-          <span>{fmtUsdg(w.value)}</span>
-        </div>
-      ))}
-      {basketShares ? (
-        <div className="kv">
-          <span><Link href="/programs">Basket Program</Link></span>
-          <span>{fmtUsdg(basketValue)}</span>
-        </div>
-      ) : null}
+      <div className="card">
+        <h3>Wells</h3>
+        {loadingLists || unreachable ? (
+          <p className="small">{unreachable ? "Unavailable" : "Loading…"}</p>
+        ) : heldWells.length === 0 && !basketShares ? (
+          <p className="small">No Well shares yet. <Link href="/wells">Browse Wells</Link></p>
+        ) : null}
+        {heldWells.map((w) => {
+          // Shares start at 1 USDG each, so value per share above 1.00 is the Well's growth since launch.
+          const perShare = w.value !== undefined && w.shares ? Number((w.value * 10n ** 12n * 10_000n) / w.shares) / 10_000 / 1e6 : undefined;
+          const growth = perShare !== undefined ? (perShare - 1) * 100 : undefined;
+          return (
+            <Link key={w.ticker} href={`/wells/${w.ticker}`} className="holding">
+              <span className="holding-ic">{w.ticker}</span>
+              <span>
+                <b>{fmtAmount(w.shares, WELL_SHARE_DECIMALS, 2)} w{w.ticker}</b>
+                <span className="small muted" style={{ display: "block" }}>{w.ticker} Well</span>
+              </span>
+              <span className="holding-v">
+                {fmtUsdg(w.value)}
+                {growth !== undefined && (
+                  <span className={growth >= 0 ? "holding-d good" : "holding-d danger"} style={{ display: "block" }}>
+                    {growth >= 0 ? "+" : ""}{growth.toFixed(2)}% per share
+                  </span>
+                )}
+              </span>
+            </Link>
+          );
+        })}
+        {basketShares ? (
+          <Link href="/programs" className="holding">
+            <span className="holding-ic">BSKT</span>
+            <span><b>Basket Program</b></span>
+            <span className="holding-v">{fmtUsdg(basketValue)}</span>
+          </Link>
+        ) : null}
 
-      <h3 className="section-title">Credit Lines</h3>
-      {!desksQ.data || unreachable ? (
-        <p className="muted small">{unreachable ? "Unavailable" : "Loading…"}</p>
-      ) : activeDesks.length === 0 ? (
-        <p className="muted small">No Credit Line positions. <Link href="/borrow">Borrow Desk</Link></p>
-      ) : null}
-      {activeDesks.map((d) => (
-        <div key={d.ticker}>
-          <div className="kv"><span><Link href="/borrow">{d.ticker} Credit Line</Link> · lent</span><span>{fmtUsdg(d.lent)}</span></div>
-          <div className="kv"><span>Pledged Well shares</span><span>{fmtUsdg(d.collateral)}</span></div>
-          <div className="kv"><span>Debt</span><span>{fmtUsdg(d.debt)}</span></div>
-        </div>
-      ))}
+        <h3 style={{ marginTop: "1.4rem" }}>Credit Lines</h3>
+        {!desksQ.data || unreachable ? (
+          <p className="small">{unreachable ? "Unavailable" : "Loading…"}</p>
+        ) : activeDesks.length === 0 ? (
+          <p className="small">No Credit Line positions. <Link href="/borrow">Borrow Desk</Link></p>
+        ) : null}
+        {activeDesks.map((d) => (
+          <Link key={d.ticker} href="/borrow" className="holding">
+            <span className="holding-ic">{d.ticker}</span>
+            <span>
+              <b>{d.ticker} Credit Line</b>
+              <span className="small muted" style={{ display: "block" }}>
+                lent {fmtUsdg(d.lent)} · pledged {fmtUsdg(d.collateral)}
+              </span>
+            </span>
+            <span className="holding-v">
+              {fmtUsdg(d.debt)}
+              <span className="holding-d dim" style={{ display: "block" }}>debt</span>
+            </span>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

@@ -7,7 +7,8 @@ import { wellAbi, wellOracleAbi } from "@/generated/abis";
 import { useDeployment } from "@/lib/deployment";
 
 const ONE_SHARE = 10n ** 12n;
-const YIELD_WINDOW_BLOCKS = 200_000n;
+// Just under the public RPC's 500k-block log limit (~12.5 hours at 0.1 s blocks).
+const YIELD_WINDOW_BLOCKS = 450_000n;
 const YEAR = 365 * 24 * 3600;
 // Annualizing fees from a few minutes of history gives absurd rates (a young chain or fresh deployment).
 const MIN_YIELD_SECONDS = 3600;

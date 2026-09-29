@@ -22,24 +22,25 @@ export function WellList() {
         </div>
       )}
       {launch.length > 0 && (
-        <>
-          <h2 className="section-title">Launching first</h2>
-          <div className="well-grid">
-            {launch.map((t) => (
-              <WellCard key={t} ticker={t} name={catalog.equityTokens[t as Ticker].name} />
-            ))}
-          </div>
-        </>
+        <div className="well-grid">
+          {launch.map((t) => (
+            <WellCard key={t} ticker={t} name={catalog.equityTokens[t as Ticker].name} />
+          ))}
+        </div>
       )}
-      <h2 className="section-title">Later Wells</h2>
-      <p className="muted small">
-        Opened once the pool for the Equity Token has enough depth and tracks its Chainlink feed.
-      </p>
-      <div className="well-grid">
-        {upcoming.map((t) => (
-          <WellCard key={t} ticker={t} name={catalog.equityTokens[t].name} />
-        ))}
-      </div>
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <h3 className="muted">Coming next</h3>
+            <p>Opened once the stock&apos;s pool has enough depth and tracks its Chainlink feed.</p>
+          </div>
+        </div>
+        <div className="well-grid">
+          {upcoming.map((t) => (
+            <WellCard key={t} ticker={t} name={catalog.equityTokens[t].name} soon />
+          ))}
+        </div>
+      </section>
     </>
   );
 }
