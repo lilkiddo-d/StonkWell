@@ -123,40 +123,65 @@ export function CreditLine({ ticker, desk, well, usdg }: { ticker: string; desk:
         ? "Amount exceeds available"
         : null;
 
+  // Health after the typed amount, for the actions that change debt or collateral.
+  const liq = risk ? BigInt(risk[1]) : undefined;
+  const healthOf = (c: bigint, dbt: bigint) => (dbt === 0n ? INFINITE : (c * liq! * 10n ** 18n) / (10_000n * dbt));
+  const nextHealth =
+    parsed === null || liq === undefined || collateral === undefined || debt === undefined
+      ? undefined
+      : tab === "Borrow"
+        ? healthOf(collateral, debt + parsed)
+        : tab === "Repay"
+          ? healthOf(collateral, debt > parsed ? debt - parsed : 0n)
+          : (tab === "Pledge" || tab === "Release") && pledged
+            ? healthOf(tab === "Pledge" ? collateral + (collateral * parsed) / pledged : parsed >= pledged ? 0n : collateral - (collateral * parsed) / pledged, debt)
+            : undefined;
+
   return (
-    <div className="card credit-line">
-      <div className="page-head">
-        <div>
-          <h2>{ticker} Credit Line</h2>
-          <p className="muted small">
-            Lend USDG to earn interest, or pledge {ticker} Well shares and borrow USDG against them.{" "}
-            <a href={explorerAddress(desk)} target="_blank" rel="noreferrer">Contract ↗</a>
-          </p>
+    <div className="stack">
+      <div className="card">
+        <div className="well-card-head">
+          <div>
+            <h2>{ticker} Credit Line</h2>
+            <p className="small" style={{ margin: "0.3rem 0 0" }}>
+              Lend USDG to earn interest, or pledge w{ticker} and borrow USDG against it.{" "}
+              <a href={explorerAddress(desk)} target="_blank" rel="noreferrer">Contract ↗</a>
+            </p>
+          </div>
+          {paused ? <Pill tone="warn">Paused</Pill> : <Pill tone="ok">Open</Pill>}
         </div>
-        {paused ? <Pill tone="warn">Paused</Pill> : <Pill tone="ok">Open</Pill>}
+        <div className="strip" style={{ marginTop: "1.1rem" }}>
+          <Stat label="Supplied" value={fmtUsdg(g<bigint>(data, 0), 0)} hint={`of ${fmtUsdg(g<bigint>(data, 7), 0)} cap`} />
+          <Stat label="Borrowed" value={fmtUsdg(g<bigint>(data, 1), 0)} hint={`of ${fmtUsdg(g<bigint>(data, 8), 0)} cap · ${fmtWadPct(g<bigint>(data, 3), 0)} used`} />
+          <Stat label="Borrow rate" value={fmtWadPct(g<bigint>(data, 4))} hint="variable, per year" />
+          <Stat label="Lend rate" value={fmtWadPct(g<bigint>(data, 5))} hint="variable, per year" />
+        </div>
+        <p className="small dim" style={{ marginBottom: 0 }}>
+          {risk ? `Max LTV ${fmtBps(risk[0])} · liquidation at ${fmtBps(risk[1])} · liquidation bonus ${fmtBps(risk[2])}` : "…"}
+        </p>
       </div>
-      <div className="stats-grid">
-        <Stat label="Supplied" value={fmtUsdg(g<bigint>(data, 0), 0)} hint={`Cap ${fmtUsdg(g<bigint>(data, 7), 0)}`} />
-        <Stat label="Borrowed" value={fmtUsdg(g<bigint>(data, 1), 0)} hint={`Cap ${fmtUsdg(g<bigint>(data, 8), 0)}`} />
-        <Stat label="Utilization" value={fmtWadPct(g<bigint>(data, 3))} />
-        <Stat label="Lend rate" value={fmtWadPct(g<bigint>(data, 5))} hint="Variable, per year" />
-        <Stat label="Borrow rate" value={fmtWadPct(g<bigint>(data, 4))} hint="Variable, per year" />
-        <Stat label="Max LTV / liquidation" value={risk ? `${fmtBps(risk[0])} / ${fmtBps(risk[1])}` : "…"} hint={risk ? `Liquidation bonus ${fmtBps(risk[2])}` : undefined} />
-      </div>
-      <div className="grid-2 tight">
-        <div>
+      <div className="grid-2">
+        <div className="card">
           <h3>Your Credit Line</h3>
           <div className="kv"><span>Lent</span><span>{fmtUsdg(lent)}</span></div>
           <div className="kv"><span>Pledged</span><span>{fmtAmount(pledged, WELL_SHARE_DECIMALS, 2)} w{ticker} ({fmtUsdg(collateral)})</span></div>
           <div className="kv"><span>Debt</span><span>{fmtUsdg(debt)}</span></div>
-          <div className="kv"><span>Can borrow</span><span>{fmtUsdg(borrowable)}</span></div>
-          <div className="kv"><span>Health</span><span className={health !== undefined && health < 11n * 10n ** 17n ? "danger" : undefined}>{fmtHealth(health)}</span></div>
-          <p className="muted small">
-            Collateral is valued at the Chainlink price, never the pool price. Below health 1.00 anyone may repay part of
-            your debt and take pledged shares at a discount.
-          </p>
+          <div className="kv"><span>Can still borrow</span><span>{fmtUsdg(borrowable)}</span></div>
+          <div style={{ marginTop: "1rem" }}>
+            <div className="label">
+              Health · <span className={health !== undefined && health < 11n * 10n ** 17n ? "danger" : undefined}>{fmtHealth(health)}</span>
+            </div>
+            <div className="health-track">
+              {health !== undefined && <span className="health-dot" style={{ left: gaugePos(health) }} />}
+              {nextHealth !== undefined && nextHealth !== health && <span className="health-dot next" style={{ left: gaugePos(nextHealth) }} />}
+            </div>
+            <p className="small dim" style={{ margin: 0 }}>
+              Below 1.00, anyone can repay part of your debt and take pledged shares at a discount. Prices pause outside
+              market hours and can gap at the open.
+            </p>
+          </div>
         </div>
-        <div>
+        <div className="card">
           <Tabs tabs={TABS} active={tab} onChange={(t) => { setTab(t); setAmount(""); }} />
           <AmountInput
             value={amount}
@@ -165,6 +190,12 @@ export function CreditLine({ ticker, desk, well, usdg }: { ticker: string; desk:
             max={limit !== undefined ? fmtAmount(limit, decimals, 2) : undefined}
             onMax={limit !== undefined ? () => setAmount(formatUnits(limit, decimals)) : undefined}
           />
+          {nextHealth !== undefined && (
+            <div className="kv">
+              <span>Health after</span>
+              <span className={nextHealth < 11n * 10n ** 17n ? "danger" : undefined}>{fmtHealth(health)} → {fmtHealth(nextHealth)}</span>
+            </div>
+          )}
           <button className="btn btn-primary wide" disabled={!parsed || tx.busy || Boolean(blocked)} onClick={submit}>
             {tx.busy ? tx.message : blocked ?? tab}
           </button>
@@ -173,4 +204,13 @@ export function CreditLine({ ticker, desk, well, usdg }: { ticker: string; desk:
       </div>
     </div>
   );
+}
+
+const INFINITE = 2n ** 255n;
+
+/// Health on a log scale: 0.70 at the left edge, 1.00 around a quarter of the way, 3.00 and above at the right.
+function gaugePos(h: bigint) {
+  const v = Number(formatUnits(h > 10n ** 21n ? 10n ** 21n : h, 18));
+  const p = Math.log(Math.max(v, 0.7) / 0.7) / Math.log(3 / 0.7);
+  return `${(Math.min(1, Math.max(0, p)) * 100).toFixed(1)}%`;
 }

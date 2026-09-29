@@ -5,17 +5,17 @@ import { useAccount, useReadContracts, useWatchAsset } from "wagmi";
 import { drawdownRetireAbi, wellTokenAbi } from "@/generated/abis";
 import { explorerAddress } from "@/lib/chains";
 import { useDeployment } from "@/lib/deployment";
-import { fmtAmount, shortAddress } from "@/lib/format";
-import { Pill, Stat } from "./ui";
-
-// $WELL trades on the Pons launchpad, whose token pages are /launchpad/<address>. NEXT_PUBLIC_WELL_TRADE_URL overrides.
-const tradeUrl = (token: string) => process.env.NEXT_PUBLIC_WELL_TRADE_URL || `https://www.ponsfamily.com/launchpad/${token}`;
+import { useBurnQueue } from "@/hooks/useProtocol";
+import { fmtAmount, fmtUsdg, shortAddress } from "@/lib/format";
+import { tradeUrl } from "@/lib/links";
+import { Pill } from "./ui";
 
 export function WellTokenDetails() {
   const { deployment, chainId } = useDeployment();
   const { isConnected } = useAccount();
   const { watchAsset, isPending } = useWatchAsset();
   const [copied, setCopied] = useState(false);
+  const queue = useBurnQueue();
   const t = { address: deployment?.wellToken, abi: wellTokenAbi, chainId } as const;
   const { data, isError } = useReadContracts({
     allowFailure: true,
@@ -47,25 +47,26 @@ export function WellTokenDetails() {
   }
 
   return (
-    <div className="card">
+    <div className="card card-ember">
       <div className="well-card-head">
         <div>
-          <h2>$WELL token</h2>
-          <p className="muted small">
-            Fixed supply. It only shrinks, as the Drawdown and Retire contract buys $WELL with the protocol&apos;s 30% fee
-            share and burns it.
+          <h2>{symbol ? `$${symbol}` : "$WELL"}</h2>
+          <p className="small" style={{ margin: "0.3rem 0 0" }}>
+            Fixed supply, minted once. Protocol fees buy it back and burn it, so supply only goes down.
           </p>
         </div>
-        {deployment ? <Pill tone="ok">Live</Pill> : <Pill tone="muted">Not deployed</Pill>}
+        {deployment ? <Pill tone="ember">Fixed supply</Pill> : <Pill tone="muted">Not deployed</Pill>}
       </div>
       {deployment && (
         <>
           {unreachable && <p className="tx-status error">Couldn&apos;t read the token from the network.</p>}
-          <div className="stats-grid">
-            <Stat label="Name" value={name ?? "…"} hint={symbol ? `Symbol ${symbol}` : undefined} />
-            <Stat label="Total supply" value={fmtAmount(supply, d, 0)} />
-            <Stat label="Retired" value={fmtAmount(retired, d, 0)} hint={retiredPct ? `${retiredPct}% of supply retired by Drawdown` : undefined} />
+          <div className="kv" style={{ marginTop: "0.9rem" }}><span>Total supply</span><span>{fmtAmount(supply, d, 0)}</span></div>
+          <div className="kv">
+            <span>Retired so far</span>
+            <span style={{ color: "var(--ember)" }}>{fmtAmount(retired, d, 0)}{retiredPct ? ` (${retiredPct}%)` : ""}</span>
           </div>
+          <div className="kv"><span>Waiting to be spent</span><span>{fmtUsdg(queue.usdg)}</span></div>
+          <div className="kv"><span>Name</span><span>{name ?? "…"}</span></div>
           <div className="kv">
             <span>Contract</span>
             <span>
@@ -74,12 +75,8 @@ export function WellTokenDetails() {
               </a>
             </span>
           </div>
-          <div className="kv">
-            <span>Decimals</span>
-            <span>{decimals ?? "…"}</span>
-          </div>
           <div className="hero-cta">
-            <a className="btn btn-primary" href={tradeUrl(deployment.wellToken)} target="_blank" rel="noreferrer">Trade $WELL on Pons ↗</a>
+            <a className="btn btn-ember" href={tradeUrl(deployment.wellToken)} target="_blank" rel="noreferrer">Trade on Pons ↗</a>
             <button className="btn" onClick={copy}>{copied ? "Copied" : "Copy address"}</button>
             {isConnected && (
               <button

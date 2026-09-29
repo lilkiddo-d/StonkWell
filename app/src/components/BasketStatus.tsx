@@ -38,7 +38,7 @@ export function BasketStatus() {
         {!deployment ? <Pill tone="muted">Not deployed</Pill> : open ? <Pill tone="ok">Open</Pill> : <Pill tone="muted">Closed</Pill>}
       </div>
       {deployment && (
-        <div className="stats-grid">
+        <div className="strip" style={{ margin: "1rem 0" }}>
           <Stat label="Held Value" value={fmtUsdg(r<bigint>(0), 0)} />
           <Stat label="Cap" value={open ? fmtUsdg(cap, 0) : "Closed"} />
           <Stat label="Wells" value={wells ? String(wells.length) : "…"} />

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ConnectButton } from "./ConnectButton";
+import { MarketChip } from "./MarketChip";
 
 const NAV = [
   { href: "/wells", label: "Wells" },
@@ -20,7 +21,7 @@ export function Header() {
   return (
     <header className="header">
       <Link href="/" className="brand">
-        <span className="brand-mark" aria-hidden>◎</span> STONKWELL
+        <span className="brand-mark" aria-hidden />STONKWELL
       </Link>
       <nav id="site-nav" className={open ? "nav open" : "nav"}>
         {NAV.map((n) => (
@@ -28,7 +29,9 @@ export function Header() {
             {n.label}
           </Link>
         ))}
+        {open && <MarketChip />}
       </nav>
+      <MarketChip />
       <ConnectButton />
       <button
         className="menu-btn"

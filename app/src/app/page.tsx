@@ -1,23 +1,27 @@
 import Link from "next/link";
-import { HeroWell } from "@/components/HeroWell";
+import { Fragment } from "react";
+import { BorrowTeaser } from "@/components/BorrowTeaser";
+import { FeeSplit } from "@/components/FeeSplit";
 import { HomeStats } from "@/components/HomeStats";
+import { Ripple } from "@/components/Ripple";
+import { WellBoard } from "@/components/WellBoard";
+import { catalog } from "@/generated/catalog";
 
-const STEPS = [
+const FLOW = [
   {
-    title: "Sink USDG",
-    body: "Pick a Well, one per Equity Token, and sink USDG. You receive Well shares that track your portion of Held Value.",
+    k: "01 · SINK",
+    title: "You deposit USDG",
+    body: "You get Well shares that track your slice of everything the Well holds. New deposits wait for the next rebalance, then go to work.",
   },
   {
-    title: "The Well works the range",
-    body: "A keeper runs concentrated liquidity on Uniswap v4 around the Chainlink price and re-ranges when needed. Rebalances are blocked if the oracle is stale or the pool drifts from it.",
+    k: "02 · WORK",
+    title: "The Well provides liquidity",
+    body: "A keeper places a tight price range around the Chainlink price and moves it as the stock moves. Every trade through the range pays a fee.",
   },
   {
-    title: "Fees compound",
-    body: "70% of swap fees are reinvested for Well holders. 30% flows to the fee router and is spent drawing down and retiring $WELL.",
-  },
-  {
-    title: "Borrow against it",
-    body: "Pledge Well shares on the Borrow Desk and open a Credit Line in USDG, priced by oracle and capped per market.",
+    k: "03 · EARN",
+    title: "Fees split 70 / 30",
+    body: "70% compounds into the Well, so each share is worth more. 30% buys $WELL on the market and burns it. Both numbers are limits in the code.",
   },
 ];
 
@@ -25,50 +29,57 @@ export default function Home() {
   return (
     <div className="page">
       <section className="hero">
-        <div className="hero-glow" aria-hidden />
-        <HeroWell />
-        <div className="hero-content">
-        <h1>
-          Sink into a Well.
-          <br />
-          <span className="accent">Let the fees pool up.</span>
-        </h1>
-        <p className="lead">
-          Stonkwell runs managed, oracle-guarded liquidity for Equity Tokens on Robinhood Chain. Sink USDG, earn swap
-          fees from the Equity Token / USDG market, and exit in USDG or in kind at any time.
-        </p>
-        <div className="hero-cta">
-          <Link href="/wells" className="btn btn-primary">Browse Wells</Link>
-          <Link href="/docs" className="btn">How it works</Link>
+        <Ripple />
+        <div>
+          <div className="eyebrow">Robinhood Chain · Uniswap v4</div>
+          <h1>
+            Stocks trade all night.
+            <br />
+            <span className="accent">Your USDG earns the fees.</span>
+          </h1>
+          <p className="lead">
+            Deposit USDG into a Well. It provides liquidity for one tokenized stock, collects a fee on every trade, and pays
+            70% of it back to you. Withdraw any time, market open or closed.
+          </p>
+          <div className="hero-cta">
+            <Link href="/wells" className="btn btn-primary">Sink USDG</Link>
+            <Link href="/docs" className="btn btn-ghost">How a Well works</Link>
+          </div>
+          <div className="hero-note">
+            {catalog.launchWells.length} Wells · ${catalog.heldValueCapUsdg.toLocaleString()} cap each · 70 / 30 fee split enforced in code
+          </div>
         </div>
-        </div>
+        <WellBoard />
       </section>
 
       <HomeStats />
 
-      <section className="steps">
-        {STEPS.map((s, i) => (
-          <div key={s.title} className="card step">
-            <div className="step-num">{i + 1}</div>
-            <h3>{s.title}</h3>
-            <p className="muted">{s.body}</p>
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <h2>What a Well does with your USDG</h2>
+            <p>One Well per stock. Each is its own contract with its own cap, so trouble in one never spills into another.</p>
           </div>
-        ))}
+        </div>
+        <div className="flow">
+          {FLOW.map((s, i) => (
+            <Fragment key={s.k}>
+              {i > 0 && <div className="flow-arrow" aria-hidden>→</div>}
+              <div className="card">
+                <span className="flow-k">{s.k}</span>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </div>
+            </Fragment>
+          ))}
+        </div>
       </section>
 
-      <section className="card split">
-        <div>
-          <h2>Where the 30% goes</h2>
-          <p className="muted">
-            All of the protocol share goes to one place: the Drawdown and Retire contract. It swaps what it receives into
-            $WELL through owner-registered pools under per-run limits and burns it. It has no withdrawal function, and
-            redirecting the fee router takes a public 48-hour delay.
-          </p>
-        </div>
-        <div className="split-figure">
-          <div className="bar"><div className="bar-depositors" style={{ width: "70%" }}>70% Well holders</div><div className="bar-protocol" style={{ width: "30%" }}>30% retire</div></div>
-        </div>
+      <section className="section">
+        <FeeSplit />
       </section>
+
+      <BorrowTeaser />
     </div>
   );
 }

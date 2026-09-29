@@ -14,6 +14,7 @@ const CONTRACTS = {
   feeRouterAbi: "FeeRouter.sol/FeeRouter.json",
   wellRegistryAbi: "WellRegistry.sol/WellRegistry.json",
   wellOracleAbi: "WellOracle.sol/WellOracle.json",
+  wellPositionV4Abi: "v4/WellPositionV4.sol/WellPositionV4.json",
 };
 
 fs.mkdirSync(OUT_DIR, { recursive: true });

@@ -61,6 +61,6 @@ export function NotDeployed({ what }: { what: string }) {
   );
 }
 
-export function Pill({ tone, children }: { tone: "ok" | "warn" | "bad" | "muted"; children: ReactNode }) {
+export function Pill({ tone, children }: { tone: "ok" | "warn" | "bad" | "muted" | "ember"; children: ReactNode }) {
   return <span className={`pill pill-${tone}`}>{children}</span>;
 }
