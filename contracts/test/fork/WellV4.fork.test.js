@@ -43,7 +43,7 @@ describe(`Well on a Robinhood Chain fork (${TICKER}/USDG)`, function () {
     await swap.setPool(key);
 
     const wellToken = await ethers.deployContract("WellToken", [admin.address, ethers.parseEther("1000000000")]);
-    const drawdown = await ethers.deployContract("DrawdownRetire", [wellToken, swap, admin.address, guardian.address, keeper.address, 3600]);
+    const drawdown = await ethers.deployContract("DrawdownRetire", [wellToken, swap, admin.address, guardian.address, keeper.address, 3600, ethers.ZeroAddress]);
     feeRouter = await ethers.deployContract("FeeRouter", [admin.address, drawdown]);
 
     position = await ethers.deployContract("WellPositionV4", [

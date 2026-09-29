@@ -16,7 +16,7 @@ describe("DrawdownRetire (extra coverage)", function () {
       it(`rejects a zero address at argument ${idx}`, async function () {
         const ctx = await loadFixture(baseFixture);
         const F = await ethers.getContractFactory("DrawdownRetire");
-        const args = [ctx.wellToken.target, ctx.swap.target, ctx.admin.address, ctx.guardian.address, ctx.keeper.address, 3600];
+        const args = [ctx.wellToken.target, ctx.swap.target, ctx.admin.address, ctx.guardian.address, ctx.keeper.address, 3600, ethers.ZeroAddress];
         args[idx] = ethers.ZeroAddress;
         await expect(F.deploy(...args)).to.be.revertedWithCustomError(F, "InvalidConfig");
       });
@@ -57,6 +57,7 @@ describe("DrawdownRetire (extra coverage)", function () {
         "revokeRole",
         "setInputLimit",
         "setMinInterval",
+        "setWellToken",
       ].sort()
     );
   });

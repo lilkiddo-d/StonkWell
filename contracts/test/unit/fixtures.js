@@ -61,6 +61,7 @@ async function baseFixture() {
     guardian.address,
     keeper.address,
     3600,
+    ethers.ZeroAddress,
   ]);
   const feeRouter = await ethers.deployContract("FeeRouter", [admin.address, drawdown]);
 

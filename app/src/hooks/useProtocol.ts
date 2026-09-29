@@ -1,10 +1,25 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { erc20Abi, parseAbiItem, type Address } from "viem";
+import { erc20Abi, parseAbiItem, zeroAddress, type Address } from "viem";
 import { usePublicClient, useReadContracts } from "wagmi";
-import { wellOracleAbi, wellPositionV4Abi } from "@/generated/abis";
+import { drawdownRetireAbi, wellOracleAbi, wellPositionV4Abi } from "@/generated/abis";
 import { useDeployment } from "@/lib/deployment";
+
+/// $WELL's address. A deployment made before the token launched records none; the token is then read from
+/// DrawdownRetire, where it is set once after the Pons launch. `pending` is true until that happens.
+export function useWellToken(): { token: Address | undefined; pending: boolean } {
+  const { deployment, chainId } = useDeployment();
+  const fixed = deployment?.wellToken ?? undefined;
+  const { data } = useReadContracts({
+    allowFailure: true,
+    query: { enabled: Boolean(deployment && !fixed), refetchInterval: 20_000 },
+    contracts: [{ address: deployment?.drawdownRetire, abi: drawdownRetireAbi, chainId, functionName: "wellToken" }],
+  });
+  const onChain = data?.[0]?.status === "success" ? (data[0].result as Address) : undefined;
+  const token = fixed ?? (onChain && onChain !== zeroAddress ? onChain : undefined);
+  return { token, pending: Boolean(deployment && !fixed && onChain === zeroAddress) };
+}
 
 /// Protocol fees not yet spent on $WELL: USDG and Equity Tokens sitting in the FeeRouter and in DrawdownRetire,
 /// valued at the oracle price. One multicall.

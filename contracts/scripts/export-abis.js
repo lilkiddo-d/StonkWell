@@ -43,7 +43,7 @@ fs.writeFileSync(
   network: string;
   chainId: number;
   usdg: \`0x\${string}\`;
-  wellToken: \`0x\${string}\`;
+  wellToken: \`0x\${string}\` | null;
   oracle: \`0x\${string}\`;
   feeRouter: \`0x\${string}\`;
   drawdownRetire: \`0x\${string}\`;

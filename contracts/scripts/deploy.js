@@ -42,10 +42,18 @@ async function main() {
   const env = LIVE ? liveEnv() : await localEnv(deployer);
   out.usdg = env.usdg;
 
+  // A live deploy can go out before $WELL exists (launching on Pons after the protocol is live): DrawdownRetire
+  // then starts without a token and the deployer sets it once with scripts/set-well-token.js. The local demo
+  // always mints its own $WELL.
+  const pendingWell = LIVE && !process.env.WELL_TOKEN_ADDRESS;
   const wellToken = process.env.WELL_TOKEN_ADDRESS
     ? await existingWellToken(process.env.WELL_TOKEN_ADDRESS)
-    : await deploy("WellToken", [roles.treasury, wad(config.launch.wellTokenSupply)]);
-  out.wellToken = await wellToken.getAddress();
+    : pendingWell
+      ? null
+      : await deploy("WellToken", [roles.treasury, wad(config.launch.wellTokenSupply)]);
+  out.wellToken = wellToken ? await wellToken.getAddress() : null;
+  out.wellTokenSetter = pendingWell ? deployer.address : null;
+  if (pendingWell) console.log(`  ${"WellToken".padEnd(18)} not yet: set it after the Pons launch with scripts/set-well-token.js`);
 
   const oracle = await deploy("WellOracle", [
     deployer.address,
@@ -71,15 +79,17 @@ async function main() {
   }
 
   const drawdown = await deploy("DrawdownRetire", [
-    wellToken,
+    wellToken ?? ethers.ZeroAddress,
     swap,
     deployer.address,
     roles.guardian,
     roles.keeper,
     config.launch.drawdownMinIntervalSeconds,
+    pendingWell ? deployer.address : ethers.ZeroAddress,
   ]);
   out.drawdownRetire = await drawdown.getAddress();
-  await (await drawdown.setInputLimit(env.usdg, usdgUnits(5_000))).wait();
+  // Small per-run buys: a fresh Pons pool holds a few ETH, so large buys move its price a lot.
+  await (await drawdown.setInputLimit(env.usdg, usdgUnits(config.launch.drawdownMaxUsdgPerRun))).wait();
 
   const feeRouter = await deploy("FeeRouter", [out.timelock, drawdown]);
   out.feeRouter = await feeRouter.getAddress();
@@ -90,7 +100,7 @@ async function main() {
   for (const ticker of config.launch.wells) {
     const t = env.equity[ticker];
     await (await oracle.setFeed(t.address, t.feed, config.chainlink.equityMaxAge)).wait();
-    await (await drawdown.setInputLimit(t.address, wad(50))).wait();
+    await (await drawdown.setInputLimit(t.address, wad(config.launch.drawdownMaxEquityPerRun))).wait();
 
     let position;
     if (LIVE) {

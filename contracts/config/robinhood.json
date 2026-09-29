@@ -72,6 +72,8 @@
     },
     "wellTokenSupply": "1000000000",
     "drawdownMinIntervalSeconds": 3600,
+    "drawdownMaxUsdgPerRun": 250,
+    "drawdownMaxEquityPerRun": "0.5",
     "timelockDelaySeconds": 172800
   }
 }
