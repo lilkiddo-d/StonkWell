@@ -1,36 +1,115 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
 import { shortAddress } from "@/lib/format";
 import { wagmiConfig } from "@/lib/wagmi";
 
+type Panel = { kind: "nowallet" } | { kind: "error"; message: string } | null;
+
 export function ConnectButton() {
   const { address, isConnected, chainId } = useAccount();
-  const { connect, connectors, isPending } = useConnect();
+  const { connectors, connectAsync, isPending } = useConnect();
   const { disconnect } = useDisconnect();
-  const { switchChain } = useSwitchChain();
+  const { switchChainAsync, isPending: switching } = useSwitchChain();
+  const [panel, setPanel] = useState<Panel>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
-  if (!isConnected) {
-    const injected = connectors[0];
-    return (
-      <button className="btn btn-primary" disabled={!injected || isPending} onClick={() => connect({ connector: injected })}>
-        {isPending ? "Connecting…" : "Connect wallet"}
-      </button>
-    );
+  useEffect(() => {
+    if (!panel) return;
+    const close = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setPanel(null);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [panel]);
+
+  async function connect() {
+    setPanel(null);
+    // Wallets announced through EIP-6963 first, then the classic window.ethereum injection.
+    const announced = connectors.find((c) => c.type === "injected" && c.id !== "injected");
+    const hasInjected = typeof window !== "undefined" && Boolean((window as { ethereum?: unknown }).ethereum);
+    const connector = announced ?? (hasInjected ? connectors.find((c) => c.id === "injected") : undefined);
+    if (!connector) return setPanel({ kind: "nowallet" });
+    try {
+      await connectAsync({ connector });
+    } catch (e) {
+      setPanel({ kind: "error", message: explain(e, "connect") });
+    }
+  }
+
+  async function switchNetwork() {
+    setPanel(null);
+    try {
+      await switchChainAsync({ chainId: wagmiConfig.chains[0].id });
+    } catch (e) {
+      setPanel({ kind: "error", message: explain(e, "switch") });
+    }
   }
 
   const supported = wagmiConfig.chains.some((c) => c.id === chainId);
-  if (!supported) {
-    return (
-      <button className="btn btn-warn" onClick={() => switchChain({ chainId: wagmiConfig.chains[0].id })}>
-        Switch to Robinhood Chain
-      </button>
-    );
-  }
-
-  return (
+  const button = !isConnected ? (
+    <button className="btn btn-primary" disabled={isPending} onClick={connect}>
+      {isPending ? "Check your wallet…" : "Connect wallet"}
+    </button>
+  ) : !supported ? (
+    <button className="btn btn-warn" disabled={switching} onClick={switchNetwork}>
+      {switching ? "Check your wallet…" : "Switch to Robinhood Chain"}
+    </button>
+  ) : (
     <button className="btn" onClick={() => disconnect()} title="Disconnect">
       {shortAddress(address!)}
     </button>
   );
+
+  return (
+    <div className="connect" ref={ref}>
+      {button}
+      {panel?.kind === "nowallet" && <NoWallet />}
+      {panel?.kind === "error" && (
+        <div className="connect-pop" role="alert">
+          <p>{panel.message}</p>
+          <button className="btn btn-sm" onClick={() => setPanel(null)}>Close</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NoWallet() {
+  const here = typeof window !== "undefined" ? window.location : undefined;
+  const target = here ? `${here.host}${here.pathname}` : "stonkwell.com";
+  const full = here ? here.href : "https://stonkwell.com";
+  const mobile = typeof navigator !== "undefined" && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  return (
+    <div className="connect-pop" role="dialog" aria-label="No wallet found">
+      <h3>No wallet in this browser</h3>
+      {mobile ? (
+        <>
+          <p>Open Stonkwell inside your wallet app&apos;s browser to connect.</p>
+          <a className="btn btn-primary wide" href={`https://metamask.app.link/dapp/${target}`}>Open in MetaMask</a>
+          <a className="btn wide" href={`https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(full)}`}>Open in Coinbase Wallet</a>
+        </>
+      ) : (
+        <>
+          <p>Install a browser wallet such as MetaMask or Rabby, then reload this page.</p>
+          <a className="btn btn-primary wide" href="https://metamask.io/download/" target="_blank" rel="noreferrer">Install MetaMask ↗</a>
+          <a className="btn wide" href="https://rabby.io/" target="_blank" rel="noreferrer">Install Rabby ↗</a>
+        </>
+      )}
+    </div>
+  );
+}
+
+function explain(e: unknown, action: "connect" | "switch") {
+  const err = e as { code?: number; name?: string; shortMessage?: string; message?: string; cause?: { code?: number } };
+  const code = err.code ?? err.cause?.code;
+  if (code === 4001 || err.name === "UserRejectedRequestError") {
+    return action === "connect" ? "The request was declined in your wallet." : "The network switch was declined in your wallet.";
+  }
+  if (code === -32002) return "Your wallet already has a request open. Open the wallet and finish or dismiss it.";
+  if (action === "switch") {
+    return "Couldn't switch networks. Add Robinhood Chain in your wallet (chain ID 4663, RPC https://rpc.mainnet.chain.robinhood.com), then try again.";
+  }
+  return err.shortMessage || err.message || "Couldn't connect to your wallet.";
 }
