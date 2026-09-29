@@ -44,11 +44,16 @@ try {
   if (-not $Rehearsal) {
     Step "Deployer wallet"
     if (-not $env:DEPLOYER_PRIVATE_KEY) {
-      $secure = Read-Host "Paste the deployer private key (hidden)" -AsSecureString
+      $secure = Read-Host "Paste the deployer private key (hidden; right-click or Ctrl+Shift+V to paste)" -AsSecureString
       $env:DEPLOYER_PRIVATE_KEY = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure))
+      $env:DEPLOYER_PRIVATE_KEY = ($env:DEPLOYER_PRIVATE_KEY -replace '\s', '')
+      if ($env:DEPLOYER_PRIVATE_KEY -notmatch '^(0x)?[0-9a-fA-F]{64}$') {
+        if ($env:DEPLOYER_PRIVATE_KEY -match '[\x00-\x1F]' -or $env:DEPLOYER_PRIVATE_KEY.Length -lt 8) { Stop-Launch "The paste didn't reach the prompt (this terminal types Ctrl+V as a character). Run it again and paste with right-click or Ctrl+Shift+V." }
+        Stop-Launch "That isn't a private key (64 hexadecimal characters). Copy it again from your wallet's export screen."
+      }
     }
     Push-Location $contracts
-    $env:DEPLOYER_ADDRESS = node -e "const k=process.env.DEPLOYER_PRIVATE_KEY.trim(); console.log(new (require('ethers').Wallet)(k.startsWith('0x')?k:'0x'+k).address)"
+    $env:DEPLOYER_ADDRESS = node -e "try { const k=process.env.DEPLOYER_PRIVATE_KEY.trim(); console.log(new (require('ethers').Wallet)(k.startsWith('0x')?k:'0x'+k).address) } catch { process.exit(1) }"
     Pop-Location
     if ($LASTEXITCODE -ne 0 -or -not $env:DEPLOYER_ADDRESS) { Stop-Launch "That doesn't look like a valid private key." }
     Write-Host "Deployer: $env:DEPLOYER_ADDRESS"

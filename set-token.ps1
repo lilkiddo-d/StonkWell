@@ -19,8 +19,13 @@ if (-not (Test-Path (Join-Path $contracts "deployments\robinhood.json"))) {
 try {
   $env:WELL_TOKEN_ADDRESS = (Read-Host "Paste the `$WELL token address from Pons").Trim()
   if ($env:WELL_TOKEN_ADDRESS -notmatch '^0x[0-9a-fA-F]{40}$') { Stop-Setup "That isn't a token address (0x followed by 40 characters)." }
-  $secure = Read-Host "Paste the DEPLOYER private key (hidden)" -AsSecureString
+  $secure = Read-Host "Paste the DEPLOYER private key (hidden; right-click or Ctrl+Shift+V to paste)" -AsSecureString
   $env:DEPLOYER_PRIVATE_KEY = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure))
+  $env:DEPLOYER_PRIVATE_KEY = ($env:DEPLOYER_PRIVATE_KEY -replace '\s', '')
+  if ($env:DEPLOYER_PRIVATE_KEY -notmatch '^(0x)?[0-9a-fA-F]{64}$') {
+    if ($env:DEPLOYER_PRIVATE_KEY -match '[\x00-\x1F]' -or $env:DEPLOYER_PRIVATE_KEY.Length -lt 8) { Stop-Setup "The paste didn't reach the prompt (this terminal types Ctrl+V as a character). Run it again and paste with right-click or Ctrl+Shift+V." }
+    Stop-Setup "That isn't a private key (64 hexadecimal characters). Copy it again from your wallet's export screen."
+  }
 
   Write-Host "`nThis permanently sets `$WELL to $env:WELL_TOKEN_ADDRESS. It can never be changed." -ForegroundColor Yellow
   if ((Read-Host "Type SET to continue") -ne "SET") { Stop-Setup "Cancelled." }
