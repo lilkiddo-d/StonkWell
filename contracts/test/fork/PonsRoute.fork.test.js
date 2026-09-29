@@ -28,7 +28,7 @@ describe("Buy-and-burn through a Pons launchpad pool on a Robinhood Chain fork",
 
     swap = await ethers.deployContract("V4SwapAdapter", [admin.address, config.uniswap.poolManager, USDG]);
     await swap.setPool(ethUsdgKey);
-    drawdown = await ethers.deployContract("DrawdownRetire", [APES, swap, admin.address, guardian.address, keeper.address, 0]);
+    drawdown = await ethers.deployContract("DrawdownRetire", [APES, swap, admin.address, guardian.address, keeper.address, 0, ethers.ZeroAddress]);
     await drawdown.setInputLimit(USDG, usdgAmt(1_000));
   });
 

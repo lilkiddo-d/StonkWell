@@ -72,7 +72,7 @@ async function main() {
 
   console.log("$WELL");
   const w = process.env.WELL_TOKEN_ADDRESS;
-  if (!w) warn("WELL_TOKEN_ADDRESS not set: the deploy will mint a new fixed-supply $WELL to the treasury");
+  if (!w) ok("no $WELL yet: deploying first; plug it in after the Pons launch with set-token.ps1");
   else if (!ethers.isAddress(w)) fail("WELL_TOKEN_ADDRESS is not an address");
   else {
     const t = new ethers.Contract(w, ["function symbol() view returns (string)", "function decimals() view returns (uint8)", "function totalSupply() view returns (uint256)", "function burn(uint256)"], provider);

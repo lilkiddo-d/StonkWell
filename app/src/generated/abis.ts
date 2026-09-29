@@ -5711,6 +5711,11 @@ export const drawdownRetireAbi = [
         "internalType": "uint32",
         "name": "minInterval_",
         "type": "uint32"
+      },
+      {
+        "internalType": "address",
+        "name": "wellTokenSetter_",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -5787,6 +5792,21 @@ export const drawdownRetireAbi = [
   {
     "inputs": [],
     "name": "TooSoon",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "Unauthorized",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "WellTokenAlreadySet",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "WellTokenUnset",
     "type": "error"
   },
   {
@@ -5951,6 +5971,19 @@ export const drawdownRetireAbi = [
       }
     ],
     "name": "RoleRevoked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "WellTokenSet",
     "type": "event"
   },
   {
@@ -6236,6 +6269,19 @@ export const drawdownRetireAbi = [
   {
     "inputs": [
       {
+        "internalType": "contract ERC20Burnable",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "setWellToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes4",
         "name": "interfaceId",
         "type": "bytes4"
@@ -6303,6 +6349,19 @@ export const drawdownRetireAbi = [
     "outputs": [
       {
         "internalType": "contract ERC20Burnable",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "wellTokenSetter",
+    "outputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }

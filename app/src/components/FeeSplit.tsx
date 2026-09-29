@@ -1,6 +1,6 @@
 "use client";
 
-import { useBurnQueue } from "@/hooks/useProtocol";
+import { useBurnQueue, useWellToken } from "@/hooks/useProtocol";
 import { useDeployment } from "@/lib/deployment";
 import { fmtUsdg } from "@/lib/format";
 import { tradeUrl } from "@/lib/links";
@@ -10,6 +10,7 @@ const C = 2 * Math.PI * 40;
 export function FeeSplit() {
   const { deployment } = useDeployment();
   const queue = useBurnQueue();
+  const { token, pending } = useWellToken();
   return (
     <div className="split">
       <div>
@@ -24,8 +25,8 @@ export function FeeSplit() {
             <div className="burn-big">{deployment ? `${fmtUsdg(queue.usdg)} waiting` : "Starts at launch"}</div>
             <p>Collected fees are spent on $WELL and burned once its pool opens on Pons.</p>
           </div>
-          <a className="btn btn-ember" href={tradeUrl(deployment?.wellToken)} target="_blank" rel="noreferrer">
-            Trade $WELL on Pons ↗
+          <a className="btn btn-ember" href={tradeUrl(token)} target="_blank" rel="noreferrer">
+            {pending ? "$WELL launching on Pons ↗" : "Trade $WELL on Pons ↗"}
           </a>
         </div>
       </div>

@@ -5,7 +5,7 @@ import { useAccount, useReadContracts, useWatchAsset } from "wagmi";
 import { drawdownRetireAbi, wellTokenAbi } from "@/generated/abis";
 import { explorerAddress } from "@/lib/chains";
 import { useDeployment } from "@/lib/deployment";
-import { useBurnQueue } from "@/hooks/useProtocol";
+import { useBurnQueue, useWellToken } from "@/hooks/useProtocol";
 import { fmtAmount, fmtUsdg, shortAddress } from "@/lib/format";
 import { tradeUrl } from "@/lib/links";
 import { Pill } from "./ui";
@@ -16,10 +16,11 @@ export function WellTokenDetails() {
   const { watchAsset, isPending } = useWatchAsset();
   const [copied, setCopied] = useState(false);
   const queue = useBurnQueue();
-  const t = { address: deployment?.wellToken, abi: wellTokenAbi, chainId } as const;
+  const { token, pending } = useWellToken();
+  const t = { address: token, abi: wellTokenAbi, chainId } as const;
   const { data, isError } = useReadContracts({
     allowFailure: true,
-    query: { enabled: Boolean(deployment) },
+    query: { enabled: Boolean(deployment && token) },
     contracts: [
       { ...t, functionName: "name" },
       { ...t, functionName: "symbol" },
@@ -40,8 +41,8 @@ export function WellTokenDetails() {
   const retiredPct = original && retired !== undefined ? (Number((retired * 1_000_000n) / original) / 10_000).toFixed(2) : undefined;
 
   async function copy() {
-    if (!deployment) return;
-    await navigator.clipboard.writeText(deployment.wellToken);
+    if (!token) return;
+    await navigator.clipboard.writeText(token);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
@@ -55,9 +56,21 @@ export function WellTokenDetails() {
             Fixed supply, minted once. Protocol fees buy it back and burn it, so supply only goes down.
           </p>
         </div>
-        {deployment ? <Pill tone="ember">Fixed supply</Pill> : <Pill tone="muted">Not deployed</Pill>}
+        {!deployment ? <Pill tone="muted">Not deployed</Pill> : pending ? <Pill tone="ember">Launching soon</Pill> : <Pill tone="ember">Fixed supply</Pill>}
       </div>
-      {deployment && (
+      {deployment && pending && (
+        <>
+          <p className="small" style={{ marginTop: "0.9rem" }}>
+            $WELL launches on Pons shortly. Protocol fees earned before then wait in the burn contract, which has no
+            withdrawal function, and are spent on $WELL once it is live.
+          </p>
+          <div className="kv"><span>Waiting to be spent</span><span>{fmtUsdg(queue.usdg)}</span></div>
+          <div className="hero-cta">
+            <a className="btn btn-ember" href={tradeUrl()} target="_blank" rel="noreferrer">Pons launchpad ↗</a>
+          </div>
+        </>
+      )}
+      {deployment && token && (
         <>
           {unreachable && <p className="tx-status error">Couldn&apos;t read the token from the network.</p>}
           <div className="kv" style={{ marginTop: "0.9rem" }}><span>Total supply</span><span>{fmtAmount(supply, d, 0)}</span></div>
@@ -70,19 +83,19 @@ export function WellTokenDetails() {
           <div className="kv">
             <span>Contract</span>
             <span>
-              <a href={explorerAddress(deployment.wellToken)} target="_blank" rel="noreferrer">
-                {shortAddress(deployment.wellToken)} ↗
+              <a href={explorerAddress(token)} target="_blank" rel="noreferrer">
+                {shortAddress(token)} ↗
               </a>
             </span>
           </div>
           <div className="hero-cta">
-            <a className="btn btn-ember" href={tradeUrl(deployment.wellToken)} target="_blank" rel="noreferrer">Trade on Pons ↗</a>
+            <a className="btn btn-ember" href={tradeUrl(token)} target="_blank" rel="noreferrer">Trade on Pons ↗</a>
             <button className="btn" onClick={copy}>{copied ? "Copied" : "Copy address"}</button>
             {isConnected && (
               <button
                 className="btn"
                 disabled={!symbol || isPending}
-                onClick={() => watchAsset({ type: "ERC20", options: { address: deployment.wellToken, symbol: symbol!, decimals: d } })}
+                onClick={() => watchAsset({ type: "ERC20", options: { address: token, symbol: symbol!, decimals: d } })}
               >
                 Add $WELL to wallet
               </button>

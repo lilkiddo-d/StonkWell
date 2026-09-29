@@ -12,13 +12,19 @@ import {ISwapAdapter} from "./interfaces/ISwapAdapter.sol";
 /// @notice Spends protocol fees on $WELL and burns every $WELL it holds.
 /// @dev There is deliberately no withdrawal or rescue path: assets leave only as burned $WELL.
 ///      Keeper runs are capped per input token and rate-limited, bounding what a bad quote can lose.
+///      The protocol can deploy before $WELL exists: the token is then set exactly once by `wellTokenSetter`
+///      and is permanent from that point. Until it is set, fees accumulate here and `drawdown` reverts.
 contract DrawdownRetire is AccessControl, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     bytes32 public constant GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");
     bytes32 public constant KEEPER_ROLE = keccak256("KEEPER_ROLE");
 
-    ERC20Burnable public immutable wellToken;
+    /// @notice The token bought and burned. Fixed at deployment or set once later; never changes after.
+    ERC20Burnable public wellToken;
+    /// @notice The only address that may set `wellToken`, and only while it is unset. Zero when the token
+    ///         was fixed at deployment.
+    address public immutable wellTokenSetter;
     ISwapAdapter public immutable swapAdapter;
 
     uint32 public minInterval;
@@ -33,31 +39,50 @@ contract DrawdownRetire is AccessControl, ReentrancyGuard {
     event InputLimitSet(address indexed token, uint256 maxPerRun);
     event MinIntervalSet(uint32 minInterval);
     event HaltSet(bool halted);
+    event WellTokenSet(address indexed token);
 
     error InvalidConfig();
+    error Unauthorized();
+    error WellTokenAlreadySet();
+    error WellTokenUnset();
     error IsHalted();
     error OverLimit();
     error TooSoon();
     error SwapShortfall(uint256 received, uint256 minimum);
 
+    /// @param wellToken_ $WELL, or zero to set it later through `setWellToken`.
+    /// @param wellTokenSetter_ Who may set $WELL once when `wellToken_` is zero; ignored otherwise.
     constructor(
         ERC20Burnable wellToken_,
         ISwapAdapter swapAdapter_,
         address admin,
         address guardian,
         address keeper,
-        uint32 minInterval_
+        uint32 minInterval_,
+        address wellTokenSetter_
     ) {
         if (
-            address(wellToken_) == address(0) || address(swapAdapter_) == address(0)
-                || admin == address(0) || guardian == address(0) || keeper == address(0)
+            (address(wellToken_) == address(0) && wellTokenSetter_ == address(0))
+                || address(swapAdapter_) == address(0) || admin == address(0) || guardian == address(0)
+                || keeper == address(0)
         ) revert InvalidConfig();
         wellToken = wellToken_;
+        wellTokenSetter = address(wellToken_) == address(0) ? wellTokenSetter_ : address(0);
         swapAdapter = swapAdapter_;
         minInterval = minInterval_;
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(GUARDIAN_ROLE, guardian);
         _grantRole(KEEPER_ROLE, keeper);
+        if (address(wellToken_) != address(0)) emit WellTokenSet(address(wellToken_));
+    }
+
+    /// @notice Sets $WELL for a deployment made before the token existed. Callable once, by `wellTokenSetter`.
+    function setWellToken(ERC20Burnable token) external {
+        if (msg.sender != wellTokenSetter) revert Unauthorized();
+        if (address(wellToken) != address(0)) revert WellTokenAlreadySet();
+        if (address(token) == address(0)) revert InvalidConfig();
+        wellToken = token;
+        emit WellTokenSet(address(token));
     }
 
     /// @notice Swaps `amountIn` of a fee token into $WELL and retires the proceeds.
@@ -68,27 +93,30 @@ contract DrawdownRetire is AccessControl, ReentrancyGuard {
         returns (uint256 wellOut)
     {
         if (halted) revert IsHalted();
+        ERC20Burnable well = wellToken;
+        if (address(well) == address(0)) revert WellTokenUnset();
         if (
-            address(tokenIn) == address(wellToken) || amountIn == 0 || minWellOut == 0
+            address(tokenIn) == address(well) || amountIn == 0 || minWellOut == 0
                 || amountIn > maxInputPerRun[address(tokenIn)]
         ) revert OverLimit();
         if (block.timestamp < uint256(lastDrawdown) + minInterval) revert TooSoon();
         lastDrawdown = uint64(block.timestamp);
 
-        uint256 before = wellToken.balanceOf(address(this));
+        uint256 before = well.balanceOf(address(this));
         tokenIn.forceApprove(address(swapAdapter), amountIn);
-        swapAdapter.swap(address(tokenIn), address(wellToken), amountIn, minWellOut, address(this), route);
+        swapAdapter.swap(address(tokenIn), address(well), amountIn, minWellOut, address(this), route);
         tokenIn.forceApprove(address(swapAdapter), 0);
-        wellOut = wellToken.balanceOf(address(this)) - before;
+        wellOut = well.balanceOf(address(this)) - before;
         if (wellOut < minWellOut) revert SwapShortfall(wellOut, minWellOut);
 
         totalSpent[address(tokenIn)] += amountIn;
         emit Drawdown(address(tokenIn), amountIn, wellOut);
-        _retire(wellToken.balanceOf(address(this)));
+        _retire(well.balanceOf(address(this)));
     }
 
-    /// @notice Burns any $WELL sent here directly. Callable by anyone.
+    /// @notice Burns any $WELL sent here directly. Callable by anyone. Does nothing before $WELL is set.
     function retireHeld() external nonReentrant {
+        if (address(wellToken) == address(0)) return;
         _retire(wellToken.balanceOf(address(this)));
     }
 

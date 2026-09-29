@@ -31,8 +31,7 @@ foreach ($name in "ADMIN_MULTISIG", "GUARDIAN_MULTISIG", "KEEPER_ADDRESS", "TREA
   if (-not (Get-Item "env:$name" -ErrorAction SilentlyContinue)) { Stop-Launch "$name is not set. Add it to launch.env." }
 }
 if (-not $env:WELL_TOKEN_ADDRESS) {
-  Write-Host "WELL_TOKEN_ADDRESS is not set: a NEW `$WELL would be minted to the treasury instead of using your Pons token." -ForegroundColor Yellow
-  if ((Read-Host "Continue without your Pons token? (yes/no)") -ne "yes") { Stop-Launch "Set WELL_TOKEN_ADDRESS in launch.env." }
+  Write-Host "No WELL_TOKEN_ADDRESS: deploying before `$WELL. After launching it on Pons, run .\set-token.ps1 to plug it in (one transaction)." -ForegroundColor Cyan
 }
 
 $outFile = Join-Path $contracts "deployments\robinhood.json"

@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Address } from "viem";
 import { useAccount, useReadContracts } from "wagmi";
 import { basketProgramAbi, borrowDeskAbi, wellAbi, wellTokenAbi } from "@/generated/abis";
+import { useWellToken } from "@/hooks/useProtocol";
 import { useDeployment } from "@/lib/deployment";
 import { fmtAmount, fmtUsdg, WELL_SHARE_DECIMALS } from "@/lib/format";
 import { ConnectButton } from "./ConnectButton";
@@ -21,10 +22,11 @@ export function YourHoldings() {
   const enabled = Boolean(deployment && address);
   const me = address!;
 
-  const t = { address: deployment?.wellToken, abi: wellTokenAbi, chainId } as const;
+  const { token: wellAddress, pending: wellPending } = useWellToken();
+  const t = { address: wellAddress, abi: wellTokenAbi, chainId } as const;
   const token = useReadContracts({
     allowFailure: true,
-    query: { enabled },
+    query: { enabled: enabled && Boolean(wellAddress) },
     contracts: [
       { ...t, functionName: "balanceOf", args: [me] },
       { ...t, functionName: "totalSupply" },
@@ -123,7 +125,7 @@ export function YourHoldings() {
       <div className="strip three">
         <Stat label="Net position" value={fmtUsdg(netValue)} hint={loaded && !priced ? "unavailable while prices are stale" : "Wells + lent − debt"} />
         <Stat label="Credit Line debt" value={fmtUsdg(totalDebt)} hint={totalDebt ? "repay any time" : "no open debt"} />
-        <Stat label="$WELL balance" value={fmtAmount(wellBalance, wellDecimals, 2)} hint={supplyPct} />
+        <Stat label="$WELL balance" value={wellPending ? "—" : fmtAmount(wellBalance, wellDecimals, 2)} hint={wellPending ? "launching soon on Pons" : supplyPct} />
       </div>
 
       <div className="card">

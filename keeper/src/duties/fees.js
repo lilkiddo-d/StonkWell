@@ -54,6 +54,15 @@ async function runDrawdown(ctx) {
     log.info("halted by guardian, skipping");
     return;
   }
+  // Deployed before $WELL launched: the token is set later on-chain (set-well-token.js), so read it from there.
+  if (!ctx.dep.wellToken) {
+    const well = await dd.wellToken();
+    if (well === ethers.ZeroAddress) {
+      log.info("$WELL not set yet; fees wait in DrawdownRetire");
+      return;
+    }
+    ctx.dep.wellToken = well;
+  }
   // lastDrawdown and minInterval are shared by every input token: at most one drawdown per interval.
   const [last, interval, now] = await Promise.all([dd.lastDrawdown(), dd.minInterval(), blockTime(ctx.provider)]);
   const next = last + interval;
