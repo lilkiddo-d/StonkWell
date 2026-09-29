@@ -76,6 +76,17 @@ main { max-width: 1180px; margin: 0 auto; padding: 0.5rem 20px 4rem; min-height:
 }
 .footer { max-width: 1180px; margin: 0 auto; padding: 1.75rem 20px; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; color: var(--dim); font-size: 0.8rem; border-top: 1px solid var(--line); }
 
+/* connect */
+.connect { position: relative; flex: none; }
+.connect-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 60; width: min(320px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--radius); padding: 1rem; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; gap: 0.6rem; }
+.connect-pop h3 { font-size: 1rem; }
+.connect-pop p { color: var(--muted); font-size: 0.88rem; margin: 0; }
+.connect-pop .btn.wide { margin-top: 0; }
+@media (max-width: 860px) {
+  .connect { position: static; }
+  .connect-pop { left: 16px; right: 16px; width: auto; top: calc(100% - 4px); }
+}
+
 /* buttons */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--surface); color: var(--text); border: 1px solid var(--line-2); padding: 0.62rem 1.1rem; border-radius: 999px; font-weight: 700; cursor: pointer; font-size: 0.92rem; font-family: var(--body); }
 .btn:hover { border-color: var(--teal); text-decoration: none; }
