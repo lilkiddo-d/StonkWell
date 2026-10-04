@@ -6,7 +6,7 @@
       "fee": 3000,
       "tickSpacing": 60,
       "poolId": "0xc748f4671a867db48b552f6b7650bf3255e05f80f00e3f7aad1b17ccb7898fdb",
-      "spotUsdg": 334.1545,
+      "spotUsdg": 334.1598,
       "offBps": 10,
       "liquidity": "651441722564994270"
     }
@@ -59,7 +59,7 @@
       "fee": 3000,
       "tickSpacing": 60,
       "poolId": "0xd4ecb79fdc521d7725d22b33ed43cb4e47aa96bfad76aa29577e3151f723ac5e",
-      "spotUsdg": 343.5459,
+      "spotUsdg": 343.561,
       "offBps": -3,
       "liquidity": "596134691278846981"
     }
@@ -83,9 +83,9 @@
       "fee": 3000,
       "tickSpacing": 60,
       "poolId": "0x5875d407a42965b0e768c8925cea290e06fa50603ef34fc99eb92a1050e6ae36",
-      "spotUsdg": 728.834,
-      "offBps": -18,
-      "liquidity": "2658150067503607379"
+      "spotUsdg": 728.8593,
+      "offBps": -17,
+      "liquidity": "2658090402358148520"
     }
   },
   "MSFT": {
@@ -95,7 +95,7 @@
       "fee": 3000,
       "tickSpacing": 60,
       "poolId": "0x9194a557b6a6bb2236b49ea7e2bbccec5d3eeb705aef00903be4b3de1d949579",
-      "spotUsdg": 517.1401,
+      "spotUsdg": 517.147,
       "offBps": -7,
       "liquidity": "245623417866783181"
     }
@@ -124,7 +124,7 @@
       "fee": 3000,
       "tickSpacing": 60,
       "poolId": "0x3bb34a44f1b2b5f32c034c38a53065a521a47b199700fa9bd19d60985ff24bf1",
-      "spotUsdg": 234.6966,
+      "spotUsdg": 234.7014,
       "offBps": -13,
       "liquidity": "485921249997973153"
     }
@@ -136,9 +136,9 @@
       "fee": 10000,
       "tickSpacing": 200,
       "poolId": "0xee430ee1003e1985e1828a01b9a20dad67ad4302994fe2abb4a173de4ac54623",
-      "spotUsdg": 190.2666,
-      "offBps": 91,
-      "liquidity": "878300976386782121"
+      "spotUsdg": 190.2719,
+      "offBps": 92,
+      "liquidity": "815462386804833533"
     }
   },
   "QQQ": {
@@ -196,8 +196,8 @@
       "fee": 3000,
       "tickSpacing": 60,
       "poolId": "0x8517f8071ae5b831b738052f12125e8e3d6c158b78728aa44ce3b25e5104d32e",
-      "spotUsdg": 371.8487,
-      "offBps": 38,
+      "spotUsdg": 371.887,
+      "offBps": 39,
       "liquidity": "756337354122253205"
     }
   }
