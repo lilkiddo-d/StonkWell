@@ -60,7 +60,12 @@ async function main() {
       const usdgPerEquity = equityIsToken0 ? (price1per0 * 1e18) / 1e6 : 1e18 / 1e6 / price1per0;
       const offBps = Math.round(((usdgPerEquity - oraclePrice) / oraclePrice) * 10_000);
       const entry = { fee, tickSpacing: spacing, poolId: id, spotUsdg: +usdgPerEquity.toFixed(4), offBps, liquidity: liquidity.toString() };
-      if (!best || liquidity > BigInt(best.liquidity)) best = entry;
+      // Wells are liquidity providers: prefer the 0.30% and 1% tiers, where fees pay for the price risk. The
+      // 0.05% and 0.01% tiers are only a fallback when neither of those has liquidity.
+      const lpTier = fee >= 3000;
+      const bestLp = best && best.fee >= 3000;
+      if (liquidity === 0n) continue;
+      if (!best || (lpTier && !bestLp) || (lpTier === bestLp && liquidity > BigInt(best.liquidity))) best = entry;
     }
     results[ticker] = { oracleUsd: oraclePrice, updatedAt: new Date(Number(updatedAt) * 1000).toISOString(), pool: best };
     console.log(ticker.padEnd(6), "oracle", oraclePrice.toFixed(2), "pool", best ? `${best.fee}/${best.tickSpacing} spot ${best.spotUsdg} off ${best.offBps}bps L=${best.liquidity}` : "none");

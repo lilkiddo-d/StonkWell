@@ -1,0 +1,72 @@
+{
+  "network": "robinhood",
+  "chainId": 4663,
+  "roles": {
+    "admin": "0x7CffE41Ff6C0B1d077229FC0c4488a791AcfF4b7",
+    "guardian": "0xa79e351a26284E7CCEdC2C1B51ec463122a2eAb7",
+    "keeper": "0x65d442d885cbdca655692Fa420b641cE99F19a5C",
+    "treasury": "0x7CffE41Ff6C0B1d077229FC0c4488a791AcfF4b7"
+  },
+  "wells": {
+    "TSLA": {
+      "well": "0x553fdde69FE1273A2EaBE1B8E2b835EdF55B0e18",
+      "position": "0x6361d233baBe6b2604c0d0D88BA653b53b9DE366",
+      "equityToken": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "name": "Tesla"
+    },
+    "NVDA": {
+      "well": "0x1f811CB4a9DA57176409Fd27C8cdEB13ad21B67e",
+      "position": "0x40307349078f11cB92e5001F36E2A12A37AC53FF",
+      "equityToken": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "name": "NVIDIA"
+    },
+    "AAPL": {
+      "well": "0x12a0592801Eb65766BBBE8cF5B9D6451B83aAC72",
+      "position": "0x8F3022D93A34256949d4de6Ca828D140D441C941",
+      "equityToken": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "name": "Apple"
+    },
+    "PLTR": {
+      "well": "0xE7423FE7b5dBA126F5baFB1723CD9354601D189d",
+      "position": "0xF765c9b53d8C99603b978240C9AC2acdc22D89D1",
+      "equityToken": "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A",
+      "name": "Palantir"
+    },
+    "META": {
+      "well": "0x470C367b2674707eEB0dB82484D8CD3cFF7E56D6",
+      "position": "0x6b50F668D6F17CdACae589eAfe6677d892413295",
+      "equityToken": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
+      "name": "Meta"
+    },
+    "GOOGL": {
+      "well": "0x61D4C5AEC49E6AAD80Df8a9B33e51e3aEaF4A2d7",
+      "position": "0x86CEC65afa028BA4de06C49F347d97b541e4f1b3",
+      "equityToken": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "name": "Alphabet"
+    },
+    "SPY": {
+      "well": "0x0A7B5E7B27BfB76A245640B605DF28d209F3010E",
+      "position": "0x498dcd0D6b72a563a7f1849fcB8335DE3AdbbbC4",
+      "equityToken": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "name": "SPDR S&P 500"
+    }
+  },
+  "creditLines": {
+    "META": "0xE3b8Be5448e9d4e005Ae9854F54D1B075d806984"
+  },
+  "timelock": "0x354C13806a752A9E3a25836016c69ae60d01E355",
+  "usdg": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+  "wellToken": null,
+  "wellTokenSetter": "0x877b6FD45d92Fc1D47aC45B15A16C5e782327E4B",
+  "oracle": "0x21283BfC085b9A7301D811bA41ea9FEff2b02422",
+  "swapAdapter": "0x07419Ae22b7b69Aa3E57eBF1969EC487E2E468f8",
+  "drawdownRetire": "0x16e3Fb479B31F30CD494B168672CbD2C95e423e3",
+  "feeRouter": "0xc27Caf40FF3565Ab6adD68c734eFc72522BC9884",
+  "registry": "0x2e8Df7C19225Fcf879ddb8Dd877d219C3568d9c6",
+  "basketProgram": "0xd8eBCA7A73633B3731aAA6fe48cb44D061265C76",
+  "pendingTimelockAcceptances": [
+    "0x21283BfC085b9A7301D811bA41ea9FEff2b02422",
+    "0x2e8Df7C19225Fcf879ddb8Dd877d219C3568d9c6",
+    "0x07419Ae22b7b69Aa3E57eBF1969EC487E2E468f8"
+  ]
+}
