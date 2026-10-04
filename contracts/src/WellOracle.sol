@@ -12,6 +12,9 @@ import {AggregatorV3Interface} from "./interfaces/AggregatorV3Interface.sol";
 ///         converted through the USDG / USD feed, so a USDG depeg is priced rather than ignored.
 ///         Owner should be the timelock.
 contract WellOracle is IWellOracle, Ownable2Step {
+    /// @notice Release of the Stonkwell contracts this deployment was built from.
+    string public constant VERSION = "1.1.0";
+
     uint256 public constant SEQUENCER_GRACE = 1 hours;
 
     uint8 public immutable usdgDecimals;

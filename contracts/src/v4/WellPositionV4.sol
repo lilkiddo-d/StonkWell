@@ -19,6 +19,9 @@ import {V4PoolMath} from "./V4PoolMath.sol";
 /// @notice Holds a Well's single concentrated range in a hookless Uniswap v4 Equity Token / USDG pool
 ///         through the canonical PositionManager. Holds no tokens between calls.
 contract WellPositionV4 is IWellPosition {
+    /// @notice Release of the Stonkwell contracts this deployment was built from.
+    string public constant VERSION = "1.1.0";
+
     using SafeERC20 for IERC20;
 
     IPoolManager public immutable poolManager;

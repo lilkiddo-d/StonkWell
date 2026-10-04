@@ -11,6 +11,9 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 ///         Anyone may call `route`. Changing the destination takes CHANGE_DELAY on top of the
 ///         owner's own timelock, so holders can watch it coming.
 contract FeeRouter is Ownable2Step, ReentrancyGuard {
+    /// @notice Release of the Stonkwell contracts this deployment was built from.
+    string public constant VERSION = "1.1.0";
+
     using SafeERC20 for IERC20;
 
     uint256 public constant CHANGE_DELAY = 48 hours;

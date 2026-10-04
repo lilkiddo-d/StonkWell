@@ -244,7 +244,7 @@ function liveEnv() {
   };
 }
 
-const DEMO_PRICES = { TSLA: 378.34, NVDA: 224.41, AAPL: 336.31, PLTR: 191.53, META: 778.25 };
+const DEMO_PRICES = { TSLA: 378.34, NVDA: 224.41, AAPL: 336.31, PLTR: 191.53, META: 778.25, GOOGL: 342.66, SPY: 766.89 };
 
 async function localEnv(deployer) {
   console.log("Local demo: deploying mock USDG, Equity Tokens, feeds and swap venue");
