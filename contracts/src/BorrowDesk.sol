@@ -18,6 +18,9 @@ import {Well} from "./Well.sol";
 ///      Chainlink, never by pool spot. Borrowing, releasing collateral against debt and liquidation
 ///      all require a fresh price. Pausing blocks supplying, pledging and borrowing only.
 contract BorrowDesk is ERC4626, AccessControl, Pausable, ReentrancyGuard {
+    /// @notice Release of the Stonkwell contracts this deployment was built from.
+    string public constant VERSION = "1.2.0";
+
     using SafeERC20 for IERC20;
 
     bytes32 public constant GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");

@@ -6,59 +6,71 @@ export const deployments: Record<number, Deployment> = {
     "chainId": 4663,
     "roles": {
       "admin": "0x7CffE41Ff6C0B1d077229FC0c4488a791AcfF4b7",
-      "guardian": "0xdB70213a60c138d7C7a18deB74733D0A3FFa3b22",
+      "guardian": "0xa79e351a26284E7CCEdC2C1B51ec463122a2eAb7",
       "keeper": "0x65d442d885cbdca655692Fa420b641cE99F19a5C",
       "treasury": "0x7CffE41Ff6C0B1d077229FC0c4488a791AcfF4b7"
     },
     "wells": {
       "TSLA": {
-        "well": "0x7f8Ffe7805D2679B4d200D7E58F7E7C26b0a40Bb",
-        "position": "0x73FA4efb92D56D39B6f53544575BAf79C5B4Fc80",
+        "well": "0x5e16Bf2f6d4222ea87C9aAB55bD34a2e257d8b4F",
+        "position": "0x8F2256A03108Df302A75f3fF9Eb51CB08315353F",
         "equityToken": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
         "name": "Tesla"
       },
       "NVDA": {
-        "well": "0xC85d290DE6B6C70026d3cc88a6c88a38dd827727",
-        "position": "0x4E54247cE2776C59628895281Db85616Ab2D4b95",
+        "well": "0xee5A85Fa329dAAD5D27d0d0879E96C853a029896",
+        "position": "0x4aEF34ebFeB09193d79C40886373598842e9C154",
         "equityToken": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
         "name": "NVIDIA"
       },
       "AAPL": {
-        "well": "0xD682805Cc52E28B0Cb3DA4765e683538c5e80925",
-        "position": "0x19DD030a767b1eb5a6737ADEEb9d3aa250445195",
+        "well": "0xbeB172eB907Fde7a77CecFf57C9fc04869445396",
+        "position": "0xcE07704C22bbc8A2B4ECB4675CDD34E5ef9A0bc6",
         "equityToken": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
         "name": "Apple"
       },
       "PLTR": {
-        "well": "0x235427Dc4649584EFcCFf0cAB7fff48a49bcA8aD",
-        "position": "0x06633D7d03C04ffDef1F9a7Fef08c943D49eF9F2",
+        "well": "0xeec4A6783768F35f27914fa277840Fb6403e677e",
+        "position": "0x81286C68d0DE0c5D32dfbF12540A7613fF0721ef",
         "equityToken": "0x894E1EC2D74FFE5AEF8Dc8A9e84686acCB964F2A",
         "name": "Palantir"
       },
       "META": {
-        "well": "0xE363A88CB9554E56b90870AA91fB8CBf51E46E4c",
-        "position": "0xC6E5d03B0b59063cb7781B785fb2f411Ab6100bA",
+        "well": "0xcA1a55B0D264486Fa446eeDEd2E15ce0E296E660",
+        "position": "0x4fBe441820D6a297d9B9D3ecB9b577c6B3E5F16f",
         "equityToken": "0xc0D6457C16Cc70d6790Dd43521C899C87ce02f35",
         "name": "Meta"
+      },
+      "GOOGL": {
+        "well": "0x77aADDCfFd5253a90195cda124122DaD2AA06Fb5",
+        "position": "0xa95b7530eBA2e137a92940AC53978e42788dA8d5",
+        "equityToken": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "name": "Alphabet"
+      },
+      "SPY": {
+        "well": "0xC4B4759D6f39215203b4896939849443F396cc60",
+        "position": "0x17ed7c56980f0f3a51b2Ac08e173d6Aae0B0d3aB",
+        "equityToken": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "name": "SPDR S&P 500"
       }
     },
     "creditLines": {
-      "META": "0xAE2910e952Ae34726B12F9A3DbA9211397b116B1"
+      "META": "0x6deF6d53EC12cC637617dEF6Ff287272C093A41E"
     },
-    "timelock": "0xAc566f9557955535474337e3adDF0E64A9386398",
+    "timelock": "0xc6A674c41E10490274e70C940ef2C55553832831",
     "usdg": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
-    "wellToken": "0x16585BD55204426eA3Fda397aeDB044e1f27F319",
-    "wellTokenSetter": "0x24De7aFbE28a9C5Ee6A0b50E2F9f81Dc8C8F56b0",
-    "oracle": "0x4C62ee7671B39e673f5FAE62fCd56a76463f13aF",
-    "swapAdapter": "0x24834f1392ff4c5A4F650B2e4A965779D1D7775A",
-    "drawdownRetire": "0xeF3A97D68dE6de5663A2446f530513B5978CCcaE",
-    "feeRouter": "0x15CF19b944C5F9B7BedE19C40714Bf138Ef5EE71",
-    "registry": "0xF71B655Da333371f3d51f76B63462a1Bcf369e95",
-    "basketProgram": "0xaa644c77B6AcaD706831A1C7250dD1e4a7A7Cff5",
+    "wellToken": null,
+    "wellTokenSetter": "0x1e60Ec1ec1911776A534F255E0c5cdBedc9e9c87",
+    "oracle": "0xf23f76c86de1BDD79a1b050d5f6780fdedD738FC",
+    "swapAdapter": "0xD8Bb226CD090c1d4c6ed6449912Fc9881cCa8cF9",
+    "drawdownRetire": "0x016aa2236dC15A3e2274914a6bf00519Bb474191",
+    "feeRouter": "0x0Fa9e1086dA270ed9893520aC5F9C46803B2Ba43",
+    "registry": "0xDE8756bC80170F06BFB02465a52AD1a2030f14E0",
+    "basketProgram": "0xAd6e1216C6198C0d550e09652B3C96d8cD1A8D2f",
     "pendingTimelockAcceptances": [
-      "0x4C62ee7671B39e673f5FAE62fCd56a76463f13aF",
-      "0xF71B655Da333371f3d51f76B63462a1Bcf369e95",
-      "0x24834f1392ff4c5A4F650B2e4A965779D1D7775A"
+      "0xf23f76c86de1BDD79a1b050d5f6780fdedD738FC",
+      "0xDE8756bC80170F06BFB02465a52AD1a2030f14E0",
+      "0xD8Bb226CD090c1d4c6ed6449912Fc9881cCa8cF9"
     ]
   },
   "31337": {

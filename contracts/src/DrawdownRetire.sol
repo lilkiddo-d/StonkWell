@@ -15,6 +15,9 @@ import {ISwapAdapter} from "./interfaces/ISwapAdapter.sol";
 ///      The protocol can deploy before $WELL exists: the token is then set exactly once by `wellTokenSetter`
 ///      and is permanent from that point. Until it is set, fees accumulate here and `drawdown` reverts.
 contract DrawdownRetire is AccessControl, ReentrancyGuard {
+    /// @notice Release of the Stonkwell contracts this deployment was built from.
+    string public constant VERSION = "1.2.0";
+
     using SafeERC20 for IERC20;
 
     bytes32 public constant GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");

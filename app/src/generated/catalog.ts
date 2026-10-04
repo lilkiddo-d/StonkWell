@@ -82,7 +82,9 @@ export const catalog = {
     "NVDA",
     "AAPL",
     "PLTR",
-    "META"
+    "META",
+    "GOOGL",
+    "SPY"
   ],
   "launchCreditLines": [
     "META"
