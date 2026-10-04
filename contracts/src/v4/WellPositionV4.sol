@@ -20,7 +20,7 @@ import {V4PoolMath} from "./V4PoolMath.sol";
 ///         through the canonical PositionManager. Holds no tokens between calls.
 contract WellPositionV4 is IWellPosition {
     /// @notice Release of the Stonkwell contracts this deployment was built from.
-    string public constant VERSION = "1.1.0";
+    string public constant VERSION = "1.2.0";
 
     using SafeERC20 for IERC20;
 

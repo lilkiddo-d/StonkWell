@@ -18,7 +18,7 @@ import {Well} from "../Well.sol";
 ///      `redeemInKind` always returns the holder's slice of every Well position instead.
 contract BasketProgram is ERC4626, AccessControl, Pausable, ReentrancyGuard {
     /// @notice Release of the Stonkwell contracts this deployment was built from.
-    string public constant VERSION = "1.1.0";
+    string public constant VERSION = "1.2.0";
 
     using SafeERC20 for IERC20;
 

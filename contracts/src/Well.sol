@@ -22,7 +22,7 @@ import {ISwapAdapter} from "./interfaces/ISwapAdapter.sol";
 ///      stays open while paused or while the oracle is stale.
 contract Well is ERC4626, AccessControl, Pausable, ReentrancyGuard {
     /// @notice Release of the Stonkwell contracts this deployment was built from.
-    string public constant VERSION = "1.1.0";
+    string public constant VERSION = "1.2.0";
 
     using SafeERC20 for IERC20;
 

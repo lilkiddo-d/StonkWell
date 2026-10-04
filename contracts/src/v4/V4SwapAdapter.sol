@@ -22,7 +22,7 @@ import {ISwapAdapter} from "../interfaces/ISwapAdapter.sol";
 ///      an intermediate hop but never the input or output: its deltas net to zero inside the unlock.
 contract V4SwapAdapter is ISwapAdapter, IUnlockCallback, Ownable2Step, ReentrancyGuard {
     /// @notice Release of the Stonkwell contracts this deployment was built from.
-    string public constant VERSION = "1.1.0";
+    string public constant VERSION = "1.2.0";
 
     using SafeERC20 for IERC20;
     using BalanceDeltaLibrary for BalanceDelta;

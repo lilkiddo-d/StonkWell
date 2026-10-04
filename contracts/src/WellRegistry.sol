@@ -7,7 +7,7 @@ import {Ownable, Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step
 /// @notice Canonical on-chain list of Stonkwell Wells, Credit Lines and Programs for the app and indexers.
 contract WellRegistry is Ownable2Step {
     /// @notice Release of the Stonkwell contracts this deployment was built from.
-    string public constant VERSION = "1.1.0";
+    string public constant VERSION = "1.2.0";
 
     enum Kind {
         Well,

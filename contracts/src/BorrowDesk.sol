@@ -19,7 +19,7 @@ import {Well} from "./Well.sol";
 ///      all require a fresh price. Pausing blocks supplying, pledging and borrowing only.
 contract BorrowDesk is ERC4626, AccessControl, Pausable, ReentrancyGuard {
     /// @notice Release of the Stonkwell contracts this deployment was built from.
-    string public constant VERSION = "1.1.0";
+    string public constant VERSION = "1.2.0";
 
     using SafeERC20 for IERC20;
 

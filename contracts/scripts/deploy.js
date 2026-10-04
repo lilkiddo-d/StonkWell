@@ -132,7 +132,7 @@ async function main() {
         keeper: roles.keeper,
         heldValueCap: usdgUnits(config.launch.heldValueCapUsdg),
       },
-      `Stonkwell ${ticker} Well`,
+      `Stonkwell ${ticker} Well Share`,
       `w${ticker}`,
     ]);
     await (await position.bind(well)).wait();
@@ -156,7 +156,7 @@ async function main() {
       },
       usdgUnits(cl.supplyCapUsdg),
       usdgUnits(cl.borrowCapUsdg),
-      `Stonkwell ${ticker} Credit Line`,
+      `Stonkwell ${ticker} Credit Line Share`,
       `cl${ticker}`,
     ]);
     await (await registry.list(desk, 1, ticker)).wait();
@@ -168,7 +168,7 @@ async function main() {
     deployer.address,
     roles.guardian,
     roles.keeper,
-    "Stonkwell Basket Program",
+    "Stonkwell Basket Share",
     "pBASKET",
   ]);
   for (const ticker of config.launch.wells) await (await basket.listWell(out.wells[ticker].well)).wait();

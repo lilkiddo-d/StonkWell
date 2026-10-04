@@ -16,7 +16,7 @@ import {ISwapAdapter} from "./interfaces/ISwapAdapter.sol";
 ///      and is permanent from that point. Until it is set, fees accumulate here and `drawdown` reverts.
 contract DrawdownRetire is AccessControl, ReentrancyGuard {
     /// @notice Release of the Stonkwell contracts this deployment was built from.
-    string public constant VERSION = "1.1.0";
+    string public constant VERSION = "1.2.0";
 
     using SafeERC20 for IERC20;
 

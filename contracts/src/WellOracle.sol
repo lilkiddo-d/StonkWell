@@ -13,7 +13,7 @@ import {AggregatorV3Interface} from "./interfaces/AggregatorV3Interface.sol";
 ///         Owner should be the timelock.
 contract WellOracle is IWellOracle, Ownable2Step {
     /// @notice Release of the Stonkwell contracts this deployment was built from.
-    string public constant VERSION = "1.1.0";
+    string public constant VERSION = "1.2.0";
 
     uint256 public constant SEQUENCER_GRACE = 1 hours;
 
